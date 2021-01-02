@@ -145,9 +145,17 @@ impl Lexer {
         }
     }
     fn number(&mut self) {
-        while self.peek().is_digit(10) || self.peek() == '.' {
+        while self.peek().is_digit(10) {
             self.advance();
         }
+
+        if self.peek() == '.' && self.peek_next().is_digit(10) {
+            self.advance();
+            while self.peek().is_digit(10) {
+                self.advance();
+            }
+        }
+
         let num = self.source[self.start..self.current]
             .parse::<f32>()
             .unwrap_or(-1.);
