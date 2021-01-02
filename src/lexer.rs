@@ -132,8 +132,9 @@ impl Lexer {
 
         if copied.is_keyword(&text).is_none() {
             self.add_token(Identifier(text.to_owned()));
+        } else {
+            self.add_token(copied.is_keyword(&text).unwrap()); // safe because checked above
         }
-        self.add_token(copied.is_keyword(&text).unwrap()); // safe because checked above
     }
     fn is_keyword(&self, word: &str) -> Option<TokenType> {
         if !self.keywords.contains_key(word) {
