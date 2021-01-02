@@ -61,18 +61,10 @@ impl Lexer {
             '*' => self.add_token(Star),
             '/' => self.add_token(Slash),
             '~' => {
-                if self.match_('=') {
-                    self.add_token(TildeEqual);
-                } else {
-                    self.add_token(Tilde);
-                }
+                self.add_token(Tilde);
             }
             '=' => {
-                if self.match_('=') {
-                    self.add_token(EqualEqual);
-                } else {
-                    self.add_token(Equal);
-                }
+                self.add_token(Equal);
             }
             '<' => {
                 if self.match_('=') {

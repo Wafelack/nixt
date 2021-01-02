@@ -10,7 +10,6 @@ pub enum TokenType {
     Identifier(String),
     Number(f32),
     Equal,
-    EqualEqual,
     Dot,
     Comma,
     Plus,
@@ -22,7 +21,6 @@ pub enum TokenType {
     Greater,
     GreaterEqual,
     Tilde,
-    TildeEqual,
 
     And,
     Func,
