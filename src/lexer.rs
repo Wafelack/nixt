@@ -29,6 +29,7 @@ impl Lexer {
         keywords.insert("var".to_owned(), Var);
         keywords.insert("const".to_owned(), Const);
         keywords.insert("set".to_owned(), Set);
+        keywords.insert("and".to_owned(), And);
         Self {
             source: source.to_owned(),
             tokens: vec![],
