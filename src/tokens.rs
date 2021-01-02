@@ -45,10 +45,12 @@ pub struct Token {
     line: usize,
 }
 
-pub fn new(typ: TokenType, lexeme: String, line: usize) -> Self{
-    Self {
-        typ,
-        lexeme,
-        line
+impl Token {
+    pub fn new(typ: TokenType, lexeme: String, line: usize) -> Self{
+        Self {
+            typ,
+            lexeme,
+            line
+        }
     }
 }
