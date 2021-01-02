@@ -1,4 +1,4 @@
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum TokenType {
     LeftBrace,
     RightBrace,
@@ -6,12 +6,11 @@ pub enum TokenType {
     RightBracket,
     LeftParen,
     RightParen,
-    String(String),
+    Str(String),
     Identifier(String),
     Number(f32),
     Equal,
     EqualEqual,
-    Colon,
     Dot,
     Comma,
     Plus,
@@ -22,8 +21,8 @@ pub enum TokenType {
     LessEqual,
     Greater,
     GreaterEqual,
-    Bang,
-    BangEqual,
+    Tilde,
+    TildeEqual,
 
     And,
     Func,
@@ -36,9 +35,13 @@ pub enum TokenType {
     True,
     False,
     While,
-    Var
+    Var,
+    Const,
+    Set,
+
+    Eof,
 }
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Token {
     typ: TokenType,
     lexeme: String,
@@ -46,11 +49,7 @@ pub struct Token {
 }
 
 impl Token {
-    pub fn new(typ: TokenType, lexeme: String, line: usize) -> Self{
-        Self {
-            typ,
-            lexeme,
-            line
-        }
+    pub fn new(typ: TokenType, lexeme: String, line: usize) -> Self {
+        Self { typ, lexeme, line }
     }
 }
