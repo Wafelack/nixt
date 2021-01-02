@@ -1,5 +1,7 @@
 use crate::{tokens::TokenType::*, tokens::*};
+use std::collections::BTreeMap;
 
+#[derive(Clone)]
 pub struct Lexer {
     source: String,
     tokens: Vec<Token>,
@@ -8,10 +10,25 @@ pub struct Lexer {
     line: usize,
     had_error: bool,
     errors: Vec<String>,
+    keywords: BTreeMap<String, TokenType>,
 }
 
 impl Lexer {
     pub fn new(source: &str) -> Self {
+        let mut keywords = BTreeMap::new();
+        keywords.insert("func".to_owned(), Func);
+        keywords.insert("else".to_owned(), Else);
+        keywords.insert("if".to_owned(), If);
+        keywords.insert("nil".to_owned(), Nil);
+        keywords.insert("or".to_owned(), Or);
+        keywords.insert("print".to_owned(), Print);
+        keywords.insert("ret".to_owned(), Return);
+        keywords.insert("true".to_owned(), True);
+        keywords.insert("false".to_owned(), False);
+        keywords.insert("while".to_owned(), While);
+        keywords.insert("var".to_owned(), Var);
+        keywords.insert("const".to_owned(), Const);
+        keywords.insert("set".to_owned(), Set);
         Self {
             source: source.to_owned(),
             tokens: vec![],
@@ -20,6 +37,7 @@ impl Lexer {
             line: 1,
             had_error: false,
             errors: vec![],
+            keywords: keywords,
         }
     }
     fn is_at_end(&self) -> bool {
@@ -70,26 +88,97 @@ impl Lexer {
                 }
             }
             '%' => {
-                while self.peek() != '\n' && !self.is_at_end() {
-                    self.advance();
+                if self.match_('=') {
+                    self.multi_line_comment();
+                } else {
+                    while self.peek() != '\n' && !self.is_at_end() {
+                        self.advance();
+                    }
                 }
             }
             ' ' | '\r' | '\t' => {}
+            '"' => self.string('"'),
+            '\'' => self.string('\''),
             '\n' => self.line += 1,
             _ => {
-                self.had_error = true;
-                self.errors.push(format!(
-                    "{}:{} | Unexpected character",
-                    self.line, self.current
-                ));
+                if c.is_digit(10) {
+                    self.number();
+                } else if c.is_alphabetic() {
+                    self.identifier();
+                } else {
+                    self.had_error = true;
+                    self.errors
+                        .push(format!("{} | Unexpected character", self.line));
+                }
             }
         }
+    }
+    fn multi_line_comment(&mut self) {
+        while self.peek() != '=' && self.peek_next() != '%' && !self.is_at_end() {
+            if self.peek() == '\n' {
+                self.line += 1;
+            }
+            self.advance();
+        }
+        self.advance();
+        self.advance(); // Skip =%
+    }
+    fn identifier(&mut self) {
+        while self.peek().is_alphanumeric() {
+            self.advance();
+        }
+        let copied = self.clone();
+        let text = &copied.source[self.start..self.current];
+
+        if copied.is_keyword(&text).is_none() {
+            self.add_token(Identifier(text.to_owned()));
+        }
+        self.add_token(copied.is_keyword(&text).unwrap()); // safe because checked above
+    }
+    fn is_keyword(&self, word: &str) -> Option<TokenType> {
+        if !self.keywords.contains_key(word) {
+            return None;
+        } else {
+            return Some(self.keywords[word].clone());
+        }
+    }
+    fn number(&mut self) {
+        while self.peek().is_digit(10) || self.peek() == '.' {
+            self.advance();
+        }
+        let num = self.source[self.start..self.current]
+            .parse::<f32>()
+            .unwrap_or(-1.);
+        self.add_token(Number(num));
+    }
+    fn string(&mut self, delimiter: char) {
+        while self.peek() != delimiter && !self.is_at_end() {
+            if self.peek() == '\n' {
+                self.line += 1;
+            }
+            self.advance();
+        }
+        if self.is_at_end() {
+            self.errors
+                .push(format!("{} | Unterminated string", self.line));
+            self.had_error = true;
+            return;
+        }
+        self.advance(); // Consume closing character
+        let value = (&self.source[self.start + 1..self.current - 1]).to_owned();
+        self.add_token(Str(value));
     }
     fn peek(&self) -> char {
         if self.is_at_end() {
             return '\0';
         }
         self.source.chars().collect::<Vec<char>>()[self.current]
+    }
+    fn peek_next(&self) -> char {
+        if self.current + 1 >= self.source.len() {
+            return '\0';
+        }
+        self.source.chars().collect::<Vec<char>>()[self.current + 1]
     }
     fn match_(&mut self, expected: char) -> bool {
         if self.is_at_end() {
