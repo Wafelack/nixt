@@ -1,7 +1,8 @@
-mod lexer;
-mod tokens;
+mod core;
+mod utils;
 
-use lexer::*;
+use self::core::lexer::*;
+use self::core::parser::*;
 use std::io::Write;
 
 fn main() {
@@ -12,8 +13,8 @@ fn main() {
         std::io::stdin().read_line(&mut input).unwrap();
         let mut lexer = Lexer::new(&input.trim());
         let toks = lexer.scan_tokens();
-        for tok in toks {
-            println!("{:?}", tok);
-        }
+        let mut parser = Parser::new(toks);
+        let ast = parser.parse();
+        println!("{:?}", ast);
     }
 }

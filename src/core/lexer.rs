@@ -1,4 +1,4 @@
-use crate::{tokens::TokenType::*, tokens::*};
+use crate::{utils::token::TokenType::*, utils::token::*};
 use std::collections::BTreeMap;
 
 #[derive(Clone)]
@@ -26,7 +26,7 @@ impl Lexer {
         keywords.insert("true".to_owned(), True);
         keywords.insert("false".to_owned(), False);
         keywords.insert("while".to_owned(), While);
-        keywords.insert("var".to_owned(), Var);
+        keywords.insert("let".to_owned(), Let);
         keywords.insert("const".to_owned(), Const);
         keywords.insert("set".to_owned(), Set);
         keywords.insert("and".to_owned(), And);

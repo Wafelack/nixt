@@ -1,4 +1,4 @@
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum TokenType {
     LeftBrace,
     RightBrace,
@@ -32,18 +32,18 @@ pub enum TokenType {
     Return,
     True,
     False,
-    While,
-    Var,
+    Let,
     Const,
+    While,
     Set,
 
     Eof,
 }
 #[derive(Debug, Clone)]
 pub struct Token {
-    typ: TokenType,
-    lexeme: String,
-    line: usize,
+    pub typ: TokenType,
+    pub lexeme: String,
+    pub line: usize,
 }
 
 impl Token {
