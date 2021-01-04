@@ -30,6 +30,12 @@ impl Node {
   pub fn add_children(&mut self, c: &Node) {
     self.child.push((*c).clone());
   }
+  pub fn get_child(&self) -> Vec<Node> {
+    self.child.clone()
+  }
+  pub fn get_type(&self) -> NodeType {
+    self.node_type.clone()
+  }
 }
 
 #[derive(Debug, Clone)]

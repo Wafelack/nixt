@@ -5,6 +5,7 @@ mod utils;
 use self::core::lexer::*;
 use self::core::parser::*;
 use std::io::Write;
+use utils::node::{NodeType::*, *};
 
 fn main() {
     loop {
@@ -30,6 +31,25 @@ fn main() {
             }
             panic!("{} parsing errors occured !", errs.len());
         }
-        println!("{:?}", ast);
+        print_node(&ast, 0);
     }
+}
+
+fn print_node(node: &Node, indentations: usize) {
+    println!("{{");
+    for children in node.get_child() {
+        print!("{}@type : ", print_indents(indentations));
+        println!("{:?}", children.get_type());
+        print!("{}@children : ", print_indents(indentations));
+        print_node(&children, indentations + 1);
+    }
+    println!("{}}}", print_indents(indentations));
+}
+
+fn print_indents(amount: usize) -> String {
+    let mut toret = String::new();
+    for _ in 0..amount {
+        toret.push_str("  ");
+    }
+    toret
 }

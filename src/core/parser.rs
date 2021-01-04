@@ -260,10 +260,6 @@ impl Parser {
     master.add_children(&name);
     master.add_children(&value);
 
-    if ast {
-      self.ast.add_children(&master);
-    }
-
     master
   }
   fn parse_token(&mut self) {
