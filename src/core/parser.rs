@@ -45,6 +45,7 @@ impl Parser {
       let to_add = match current.typ {
         TokenType::Return => self.parse_return(),
         If => self.parse_condition(),
+        While => self.parse_loop(),
         LeftParen => self.parse_block(ast),
         Let | Const | Set => self.parse_assignement(&current.typ, ast),
         Plus | Minus | Star | Slash => self.parse_op(&current.typ),
@@ -153,6 +154,38 @@ impl Parser {
     master.add_children(&rhs);
     master
   }
+  fn parse_loop(&mut self) -> Node {
+    let mut master = Node::new(Loop);
+    let first_tok = self.advance();
+
+    let check = match &first_tok.typ {
+      LeftParen => self.parse_block(false),
+      Identifier(s) => Node::new(NodeIdentifier(s.to_string())),
+      _ => {
+        self.had_error = true;
+        self
+          .errors
+          .push(format!("{} | Invalid token: {:?}", self.line, first_tok));
+        Node::new(None)
+      }
+    };
+
+    let body_tok = self.advance();
+    let body = match &body_tok.typ {
+      LeftParen => self.parse_block(false),
+      _ => {
+        self.had_error = true;
+        self
+          .errors
+          .push(format!("{} | Invalid character {:?}", self.line, body_tok));
+        Node::new(None)
+      }
+    };
+
+    master.add_children(&check);
+    master.add_children(&body);
+    master
+  }
   fn parse_condition(&mut self) -> Node {
     let mut master = Node::new(Condition);
 
@@ -171,7 +204,7 @@ impl Parser {
     };
 
     let todo_if_tok = self.advance();
-    let todo_if_tok = match &todo_if_tok.typ {
+    let todo_if = match &todo_if_tok.typ {
       LeftParen => self.parse_block(false),
       _ => {
         self.had_error = true;
@@ -184,14 +217,14 @@ impl Parser {
     };
     let todo_else_tok = self.advance();
 
-    let todo_else_tok = match &todo_else_tok.typ {
+    let todo_else = match &todo_else_tok.typ {
       LeftParen => self.parse_block(false),
       _ => Node::new(None), // Valid because Else block is not required
     };
 
     master.add_children(&check);
-    master.add_children(&todo_if_tok);
-    master.add_children(&todo_else_tok);
+    master.add_children(&todo_if);
+    master.add_children(&todo_else);
     master
   }
   fn peek(&self) -> Option<Token> {
