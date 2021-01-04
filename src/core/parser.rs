@@ -38,6 +38,11 @@ impl Parser {
       if self.is_at_end() || self.peek().unwrap().typ == RightParen {
         if self.peek().is_some() && self.peek().unwrap().typ == RightParen {
           self.advance(); // Consume closing char
+        } else if self.is_at_end() {
+          self.had_error = true;
+          self
+            .errors
+            .push("Parsing error: unclosed delimiter".to_owned())
         }
         break;
       }
@@ -232,9 +237,12 @@ impl Parser {
       Eof => return Node::new(None),
       _ => {
         self.had_error = true;
-        self
-          .errors
-          .push(format!("{} | Invalid token: {:?}", self.line, first_tok));
+        self.errors.push(format!(
+          "{} | Invalid token: {:?} occured on code line {}",
+          self.line,
+          first_tok,
+          line!()
+        ));
         Node::new(None)
       }
     };
@@ -243,9 +251,12 @@ impl Parser {
       LeftParen => self.parse_block(false),
       _ => {
         self.had_error = true;
-        self
-          .errors
-          .push(format!("{} | Invalid token: {:?}", self.line, first_tok));
+        self.errors.push(format!(
+          "{} | Invalid token: {:?} occured on code line {}",
+          self.line,
+          sec_tok,
+          line!()
+        ));
         Node::new(Block)
       }
     };
