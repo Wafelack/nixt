@@ -25,8 +25,10 @@ impl Parser {
   }
   fn advance(&mut self) -> Token {
     self.current += 1;
-    self.line = self.tokens[self.current - 1].line;
-    self.tokens[self.current - 1].clone()
+    let toret = self.tokens[self.current - 1].clone();
+    self.line = toret.line;
+    eprintln!("{} - {:?}", self.current - 1, &toret);
+    toret
   }
   fn is_at_end(&self) -> bool {
     self.current >= self.tokens.len() || self.tokens[self.current].typ == Eof
@@ -61,9 +63,12 @@ impl Parser {
         Identifier(s) => self.function_call(s),
         _ => {
           self.had_error = true;
-          self
-            .errors
-            .push(format!("{} | Invalid token: {:?}", self.line, current));
+          self.errors.push(format!(
+            "{} | Invalid token: {:?} occured on code line {}",
+            self.line,
+            current,
+            line!()
+          ));
           Node::new(None)
         }
       };
@@ -97,9 +102,13 @@ impl Parser {
         False => Node::new(NodeBool(false)),
         _ => {
           self.had_error = true;
-          self
-            .errors
-            .push(format!("{} | Invalid token: {:?}", self.line, current));
+          self.errors.push(format!(
+            "{} | Invalid token: {:?}-{} occured on code line {}",
+            self.line,
+            current,
+            self.current,
+            line!()
+          ));
           Node::new(None)
         }
       };
@@ -123,9 +132,13 @@ impl Parser {
       TokenType::Func => self.parse_func(),
       _ => {
         self.had_error = true;
-        self
-          .errors
-          .push(format!("{} | Invalid token: {:?}", self.line, to_ret));
+        self.errors.push(format!(
+          "{} | Invalid token: {:?}-{} occured on code line {}",
+          self.line,
+          to_ret,
+          self.current,
+          line!()
+        ));
         Node::new(None)
       }
     };
@@ -161,9 +174,13 @@ impl Parser {
       TokenType::Func => self.parse_func(),
       _ => {
         self.had_error = true;
-        self
-          .errors
-          .push(format!("{} | Invalid token: {:?}", self.line, lhs_tok));
+        self.errors.push(format!(
+          "{} | Invalid token: {:?}-{} occured on code line {}",
+          self.line,
+          lhs_tok,
+          self.current,
+          line!()
+        ));
         Node::new(None)
       }
     };
@@ -185,9 +202,13 @@ impl Parser {
       TokenType::Func => self.parse_func(),
       _ => {
         self.had_error = true;
-        self
-          .errors
-          .push(format!("{} | Invalid token: {:?}", self.line, rhs_tok));
+        self.errors.push(format!(
+          "{} | Invalid token: {:?}-{} occured on code line {}",
+          self.line,
+          rhs_tok,
+          self.current,
+          line!()
+        ));
         Node::new(None)
       }
     };
@@ -205,9 +226,13 @@ impl Parser {
       Identifier(s) => Node::new(NodeIdentifier(s.to_string())),
       _ => {
         self.had_error = true;
-        self
-          .errors
-          .push(format!("{} | Invalid token: {:?}", self.line, first_tok));
+        self.errors.push(format!(
+          "{} | Invalid token: {:?}-{} occured on code line {}",
+          self.line,
+          first_tok,
+          self.current,
+          line!()
+        ));
         Node::new(None)
       }
     };
@@ -217,9 +242,13 @@ impl Parser {
       LeftParen => self.parse_block(false),
       _ => {
         self.had_error = true;
-        self
-          .errors
-          .push(format!("{} | Invalid character {:?}", self.line, body_tok));
+        self.errors.push(format!(
+          "{} | Invalid character {:?}-{} occured on code line {}",
+          self.line,
+          body_tok,
+          self.current,
+          line!()
+        ));
         Node::new(None)
       }
     };
@@ -238,9 +267,10 @@ impl Parser {
       _ => {
         self.had_error = true;
         self.errors.push(format!(
-          "{} | Invalid token: {:?} occured on code line {}",
+          "{} | Invalid token: {:?}-{} occured on code line {}",
           self.line,
           first_tok,
+          self.current,
           line!()
         ));
         Node::new(None)
@@ -252,9 +282,10 @@ impl Parser {
       _ => {
         self.had_error = true;
         self.errors.push(format!(
-          "{} | Invalid token: {:?} occured on code line {}",
+          "{} | Invalid token: {:?}-{} occured on code line {}",
           self.line,
           sec_tok,
+          self.current,
           line!()
         ));
         Node::new(Block)
@@ -297,9 +328,13 @@ impl Parser {
       Identifier(s) => Node::new(NodeIdentifier(s.to_string())),
       _ => {
         self.had_error = true;
-        self
-          .errors
-          .push(format!("{} | Invalid token: {:?}", self.line, first_tok));
+        self.errors.push(format!(
+          "{} | Invalid token: {:?}-{} occured on code line {}",
+          self.line,
+          first_tok,
+          self.current,
+          line!()
+        ));
         Node::new(None)
       }
     };
@@ -341,11 +376,16 @@ impl Parser {
       LeftParen => self.parse_block(false),
       Number(f) => Node::new(NodeNumber(f)),
       Str(s) => Node::new(NodeStr(s)),
+      Identifier(s) => Node::new(NodeIdentifier(s)),
       _ => {
         self.had_error = true;
-        self
-          .errors
-          .push(format!("{} | Invalid token: {:?}", self.line, first_tok));
+        self.errors.push(format!(
+          "{} | Invalid token: {:?}-{} occured on code line {}",
+          self.line,
+          first_tok,
+          self.current,
+          line!()
+        ));
         Node::new(None)
       }
     };
@@ -356,11 +396,16 @@ impl Parser {
       LeftParen => self.parse_block(false),
       Number(f) => Node::new(NodeNumber(f)),
       Str(s) => Node::new(NodeStr(s)),
+      Identifier(s) => Node::new(NodeIdentifier(s)),
       _ => {
         self.had_error = true;
-        self
-          .errors
-          .push(format!("{} | Invalid token: {:?}", self.line, second_tok));
+        self.errors.push(format!(
+          "{} | Invalid token: {:?}-{} occured on code line {}",
+          self.line,
+          second_tok,
+          self.current,
+          line!()
+        ));
         Node::new(None)
       }
     };
@@ -382,9 +427,13 @@ impl Parser {
       Identifier(s) => Node::new(NodeIdentifier(s)),
       _ => {
         self.had_error = true;
-        self
-          .errors
-          .push(format!("{} | Invalid token: {:?}", self.line, name_tok));
+        self.errors.push(format!(
+          "{} | Invalid token: {:?}-{} occured on code line {}",
+          self.line,
+          name_tok,
+          self.current,
+          line!()
+        ));
         return Node::new(None);
       }
     };
@@ -401,9 +450,13 @@ impl Parser {
       LeftParen => self.parse_block(false),
       _ => {
         self.had_error = true;
-        self
-          .errors
-          .push(format!("{} | Invalid token: {:?}", self.line, value_tok));
+        self.errors.push(format!(
+          "{} | Invalid token: {:?}-{} occured on code line {}",
+          self.line,
+          value_tok,
+          self.current,
+          line!()
+        ));
         return Node::new(None);
       }
     };
@@ -430,9 +483,13 @@ impl Parser {
       }
       _ => {
         self.had_error = true;
-        self
-          .errors
-          .push(format!("{} | Invalid token: {:?}", self.line, current));
+        self.errors.push(format!(
+          "{} | Invalid token: {:?}-{} occured on code line {}",
+          self.line,
+          current,
+          self.current,
+          line!()
+        ));
       }
     }
   }
