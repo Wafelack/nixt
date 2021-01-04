@@ -2,9 +2,26 @@
 mod test {
   use crate::{
     core::lexer::*,
+    core::parser::*,
+    utils::node::*,
     utils::token::{TokenType::*, *},
   };
 
+  #[test]
+  fn parsing() -> Result<(), ()> {
+    let to_parse = "(let foo 5)";
+    let mut lexer = Lexer::new(to_parse);
+    let tokens = lexer.scan_tokens();
+    if lexer.had_error() {
+      return Err(());
+    }
+    let mut parser = Parser::new(tokens);
+    let ast = parser.parse();
+    if parser.had_error() {
+      return Err(());
+    }
+    Ok(())
+  }
   #[test]
   fn tokenizing() {
     let to_tokenize = "(let foo (+ 5 ( + 9 4)))(if (> foo 14) (print \"Greater that 14\")(print \"Less that 14\")))";
