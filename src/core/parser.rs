@@ -31,7 +31,7 @@ impl Parser {
   fn is_at_end(&self) -> bool {
     self.current >= self.tokens.len() || self.tokens[self.current].typ == Eof
   }
-  fn parse_block(&mut self) -> Node {
+  fn parse_block(&mut self, ast: bool) -> Node {
     let mut toret = Node::new(Block);
 
     loop {
@@ -44,8 +44,8 @@ impl Parser {
       let current = self.advance();
       let to_add = match current.typ {
         If => self.parse_condition(),
-        LeftParen => self.parse_block(),
-        Let | Const | Set => self.parse_assignement(&current.typ),
+        LeftParen => self.parse_block(ast),
+        Let | Const | Set => self.parse_assignement(&current.typ, ast),
         Plus | Minus | Star | Slash => self.parse_op(&current.typ),
         Less | LessEqual | And | Or | Tilde | Equal | Greater | GreaterEqual => {
           self.parse_verif(&current.typ)
@@ -60,6 +60,9 @@ impl Parser {
         }
       };
       toret.add_children(&to_add);
+      if ast {
+        self.ast.add_children(&toret);
+      }
     }
     toret
   }
@@ -78,7 +81,7 @@ impl Parser {
     let lhs_tok = self.advance();
 
     let lhs = match &lhs_tok.typ {
-      LeftParen => self.parse_block(),
+      LeftParen => self.parse_block(false),
       Number(f) => Node::new(NodeNumber(*f)),
       Str(s) => Node::new(NodeStr((*s).clone())),
       True | False => {
@@ -102,7 +105,7 @@ impl Parser {
     let rhs_tok = self.advance();
 
     let rhs = match &rhs_tok.typ {
-      LeftParen => self.parse_block(),
+      LeftParen => self.parse_block(false),
       Number(f) => Node::new(NodeNumber(*f)),
       Str(s) => Node::new(NodeStr((*s).clone())),
       True | False => {
@@ -133,7 +136,7 @@ impl Parser {
     let first_tok = self.advance();
 
     let check = match &first_tok.typ {
-      LeftParen => self.parse_block(),
+      LeftParen => self.parse_block(false),
       Identifier(s) => Node::new(NodeIdentifier(s.to_string())),
       _ => {
         self.had_error = true;
@@ -146,7 +149,7 @@ impl Parser {
 
     let todo_if_tok = self.advance();
     let todo_if_tok = match &todo_if_tok.typ {
-      LeftParen => self.parse_block(),
+      LeftParen => self.parse_block(false),
       _ => {
         self.had_error = true;
         self.errors.push(format!(
@@ -159,14 +162,13 @@ impl Parser {
     let todo_else_tok = self.advance();
 
     let todo_else_tok = match &todo_else_tok.typ {
-      LeftParen => self.parse_block(),
+      LeftParen => self.parse_block(false),
       _ => Node::new(None), // Valid because Else block is not required
     };
 
     master.add_children(&check);
     master.add_children(&todo_if_tok);
     master.add_children(&todo_else_tok);
-    self.ast.add_children(&master);
     master
   }
   fn peek(&self) -> Option<Token> {
@@ -179,7 +181,7 @@ impl Parser {
     let first_tok = self.advance();
 
     let first = match first_tok.typ {
-      LeftParen => self.parse_block(),
+      LeftParen => self.parse_block(false),
       Number(f) => Node::new(NodeNumber(f)),
       Str(s) => Node::new(NodeStr(s)),
       _ => {
@@ -194,7 +196,7 @@ impl Parser {
     let second_tok = self.advance();
 
     let second = match second_tok.typ {
-      LeftParen => self.parse_block(),
+      LeftParen => self.parse_block(false),
       Number(f) => Node::new(NodeNumber(f)),
       Str(s) => Node::new(NodeStr(s)),
       _ => {
@@ -216,7 +218,7 @@ impl Parser {
     master.add_children(&second);
     master
   }
-  fn parse_assignement(&mut self, typ: &TokenType) -> Node {
+  fn parse_assignement(&mut self, typ: &TokenType, ast: bool) -> Node {
     let name_tok = self.advance();
 
     let name = match name_tok.typ {
@@ -239,7 +241,7 @@ impl Parser {
       True => Node::new(NodeBool(true)),
       False => Node::new(NodeBool(false)),
       Plus | Minus | Star | Slash => self.parse_op(&value_tok.typ),
-      LeftParen => self.parse_block(),
+      LeftParen => self.parse_block(ast),
       _ => {
         self.had_error = true;
         self
@@ -258,7 +260,9 @@ impl Parser {
     master.add_children(&name);
     master.add_children(&value);
 
-    self.ast.add_children(&master);
+    if ast {
+      self.ast.add_children(&master);
+    }
 
     master
   }
@@ -269,7 +273,7 @@ impl Parser {
     match current.typ {
       LeftParen => {
         let mut blck = Node::new(Block);
-        blck.add_children(&self.parse_block());
+        blck.add_children(&self.parse_block(true));
       }
       _ => {
         self.had_error = true;
