@@ -26,26 +26,81 @@ impl Parser {
     self.tokens[self.current - 1].clone()
   }
   fn is_at_end(&self) -> bool {
-    self.current >= self.tokens.len()
+    self.current >= self.tokens.len() || self.tokens[self.current].typ == Eof
   }
   fn parse_block(&mut self, blk_type: TokenType) -> Node {
     let mut toret = Node::new(Block);
+    let to_match = match blk_type {
+      LeftParen => RightParen,
+      _ => RightBrace,
+    };
 
-    let mut current = self.advance();
-    while !self.is_at_end() && current.typ != blk_type {
+    loop {
+      if self.is_at_end() || self.peek().unwrap().typ == to_match {
+        if self.peek().is_some() && self.peek().unwrap().typ == to_match {
+          self.advance(); // Consume closing char
+        }
+        break;
+      }
+      let current = self.advance();
       let to_add = match current.typ {
         LeftParen | LeftBrace => self.parse_block(current.typ),
         Let | Const | Set => self.parse_assignement(&current.typ),
+        Plus => self.parse_adding(),
+        Identifier(s) => Node::new(NodeIdentifier(s)),
         _ => {
           self.had_error = true;
-          self.errors.push(format!("Invalid token: {:?}", current));
+          self
+            .errors
+            .push(format!("{} | Invalid token: {:?}", line!(), current));
           Node::new(None)
         }
       };
       toret.add_children(&to_add);
-      current = self.advance();
     }
     toret
+  }
+  fn peek(&self) -> Option<Token> {
+    if self.is_at_end() {
+      return std::option::Option::None;
+    }
+    Some(self.tokens[self.current].clone())
+  }
+  fn parse_adding(&mut self) -> Node {
+    let first_tok = self.advance();
+
+    let first = match first_tok.typ {
+      LeftParen | LeftBrace => self.parse_block(first_tok.typ),
+      Number(f) => Node::new(NodeNumber(f)),
+      Str(s) => Node::new(NodeStr(s)),
+      _ => {
+        self.had_error = true;
+        self
+          .errors
+          .push(format!("{} | Invalid token: {:?}", line!(), first_tok));
+        Node::new(None)
+      }
+    };
+
+    let second_tok = self.advance();
+
+    let second = match second_tok.typ {
+      LeftParen | LeftBrace => self.parse_block(second_tok.typ),
+      Number(f) => Node::new(NodeNumber(f)),
+      Str(s) => Node::new(NodeStr(s)),
+      _ => {
+        self.had_error = true;
+        self
+          .errors
+          .push(format!("{} | Invalid token: {:?}", line!(), second_tok));
+        Node::new(None)
+      }
+    };
+
+    let mut master = Node::new(Operator(OperatorType::Plus));
+    master.add_children(&first);
+    master.add_children(&second);
+    master
   }
   fn parse_assignement(&mut self, typ: &TokenType) -> Node {
     let name_tok = self.advance();
@@ -54,7 +109,9 @@ impl Parser {
       Identifier(s) => Node::new(NodeIdentifier(s)),
       _ => {
         self.had_error = true;
-        self.errors.push(format!("Invalid token: {:?}", name_tok));
+        self
+          .errors
+          .push(format!("{} | Invalid token: {:?}", line!(), name_tok));
         return Node::new(None);
       }
     };
@@ -65,10 +122,13 @@ impl Parser {
       Number(f) => Node::new(NodeNumber(f)),
       Str(s) => Node::new(NodeStr(s)),
       Identifier(s) => Node::new(NodeIdentifier(s)),
-      RightParen | RightBrace => self.parse_block(value_tok.typ),
+      Plus => self.parse_adding(),
+      LeftParen | RightParen => self.parse_block(value_tok.typ),
       _ => {
         self.had_error = true;
-        self.errors.push(format!("Invalid token: {:?}", value_tok));
+        self
+          .errors
+          .push(format!("{} | Invalid token: {:?}", line!(), value_tok));
         return Node::new(None);
       }
     };
@@ -96,7 +156,9 @@ impl Parser {
       }
       _ => {
         self.had_error = true;
-        self.errors.push(format!("Invalid token: {:?}", current));
+        self
+          .errors
+          .push(format!("{} | Invalid token: {:?}", line!(), current));
       }
     }
   }
@@ -105,5 +167,11 @@ impl Parser {
       self.parse_token();
     }
     self.ast.clone()
+  }
+  pub fn had_error(&self) -> bool {
+    self.had_error
+  }
+  pub fn get_errors(&self) -> Vec<String> {
+    self.errors.clone()
   }
 }

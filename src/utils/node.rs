@@ -2,7 +2,7 @@
 pub enum NodeType {
   Assignement(AssignType),
   Condition(ConditionType),
-  Operator(Operator),
+  Operator(OperatorType),
   Check(CheckType),
   Func,
   Loop,
@@ -57,7 +57,7 @@ pub enum ConditionType {
 }
 
 #[derive(Debug, Clone)]
-pub enum Operator {
+pub enum OperatorType {
   Plus,
   Minus,
   Times,

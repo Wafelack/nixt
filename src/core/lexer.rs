@@ -182,6 +182,12 @@ impl Lexer {
         }
         self.source.chars().collect::<Vec<char>>()[self.current + 1]
     }
+    pub fn had_error(&self) -> bool {
+        self.had_error
+    }
+    pub fn get_errors(&self) -> Vec<String> {
+        self.errors.clone()
+    }
     fn match_(&mut self, expected: char) -> bool {
         if self.is_at_end() {
             return false;
