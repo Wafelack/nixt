@@ -7,7 +7,7 @@ mod test {
 
   #[test]
   fn tokenizing() {
-    let to_tokenize = "(let foo (+ 5 ( + 9 4)))(if (> foo 14) ( (print \"Greater that 14\")(print \"Less that 14\")))";
+    let to_tokenize = "(let foo (+ 5 ( + 9 4)))(if (> foo 14) (print \"Greater that 14\")(print \"Less that 14\")))";
     let mut lexer = Lexer::new(to_tokenize);
     let tokens = lexer.scan_tokens();
 

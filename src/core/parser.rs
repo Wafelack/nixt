@@ -25,6 +25,7 @@ impl Parser {
   }
   fn advance(&mut self) -> Token {
     self.current += 1;
+    self.line = self.tokens[self.current - 1].line;
     self.tokens[self.current - 1].clone()
   }
   fn is_at_end(&self) -> bool {
@@ -87,7 +88,8 @@ impl Parser {
           Node::new(NodeBool(false))
         }
       }
-      TokenType::Func => unimplemented!(),
+      Identifier(s) => Node::new(NodeIdentifier(s.to_owned())),
+      TokenType::Func => todo!(),
       _ => {
         self.had_error = true;
         self
@@ -110,6 +112,7 @@ impl Parser {
           Node::new(NodeBool(false))
         }
       }
+      Identifier(s) => Node::new(NodeIdentifier(s.to_owned())),
       TokenType::Func => todo!(),
       _ => {
         self.had_error = true;
@@ -127,10 +130,21 @@ impl Parser {
   fn parse_condition(&mut self) -> Node {
     let mut master = Node::new(Condition);
 
-    let check = self.parse_block();
+    let first_tok = self.advance();
+
+    let check = match &first_tok.typ {
+      LeftParen => self.parse_block(),
+      Identifier(s) => Node::new(NodeIdentifier(s.to_string())),
+      _ => {
+        self.had_error = true;
+        self
+          .errors
+          .push(format!("{} | Invalid token: {:?}", self.line, first_tok));
+        Node::new(None)
+      }
+    };
 
     let todo_if_tok = self.advance();
-    println!("{:?}", todo_if_tok);
     let todo_if_tok = match &todo_if_tok.typ {
       LeftParen => self.parse_block(),
       _ => {
@@ -152,7 +166,7 @@ impl Parser {
     master.add_children(&check);
     master.add_children(&todo_if_tok);
     master.add_children(&todo_else_tok);
-
+    self.ast.add_children(&master);
     master
   }
   fn peek(&self) -> Option<Token> {
