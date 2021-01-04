@@ -58,10 +58,8 @@ impl Parser {
         _ => {
           self.had_error = true;
           self.errors.push(format!(
-            "{} | Invalid token: {:?} occured on code line {}",
-            self.line,
-            current,
-            line!()
+            "Line {} | Found an invalid token in block parsing: `{}`",
+            self.line, current.lexeme,
           ));
           Node::new(None)
         }
@@ -97,11 +95,8 @@ impl Parser {
         _ => {
           self.had_error = true;
           self.errors.push(format!(
-            "{} | Invalid token: {:?}-{} occured on code line {}",
-            self.line,
-            current,
-            self.current,
-            line!()
+            "Line {} | Found an invalid token in function call: `{}`",
+            self.line, current.lexeme,
           ));
           Node::new(None)
         }
@@ -127,11 +122,8 @@ impl Parser {
       _ => {
         self.had_error = true;
         self.errors.push(format!(
-          "{} | Invalid token: {:?}-{} occured on code line {}",
-          self.line,
-          to_ret,
-          self.current,
-          line!()
+          "Line {} | Found an invalid token in return: `{}`",
+          self.line, to_ret.lexeme,
         ));
         Node::new(None)
       }
@@ -169,11 +161,8 @@ impl Parser {
       _ => {
         self.had_error = true;
         self.errors.push(format!(
-          "{} | Invalid token: {:?}-{} occured on code line {}",
-          self.line,
-          lhs_tok,
-          self.current,
-          line!()
+          "Line {} | Found an invalid token in condition: `{}`",
+          self.line, lhs_tok.lexeme,
         ));
         Node::new(None)
       }
@@ -197,11 +186,8 @@ impl Parser {
       _ => {
         self.had_error = true;
         self.errors.push(format!(
-          "{} | Invalid token: {:?}-{} occured on code line {}",
-          self.line,
-          rhs_tok,
-          self.current,
-          line!()
+          "Line {} | Found an invalid token in condition: `{}`",
+          self.line, rhs_tok.lexeme,
         ));
         Node::new(None)
       }
@@ -221,11 +207,8 @@ impl Parser {
       _ => {
         self.had_error = true;
         self.errors.push(format!(
-          "{} | Invalid token: {:?}-{} occured on code line {}",
-          self.line,
-          first_tok,
-          self.current,
-          line!()
+          "Line {} | Found an invalid token in loop condition `{}`",
+          self.line, first_tok.lexeme,
         ));
         Node::new(None)
       }
@@ -237,11 +220,8 @@ impl Parser {
       _ => {
         self.had_error = true;
         self.errors.push(format!(
-          "{} | Invalid character {:?}-{} occured on code line {}",
-          self.line,
-          body_tok,
-          self.current,
-          line!()
+          "Line {} | Found an invalid token in loop body: `{}`",
+          self.line, body_tok.lexeme,
         ));
         Node::new(None)
       }
@@ -261,11 +241,8 @@ impl Parser {
       _ => {
         self.had_error = true;
         self.errors.push(format!(
-          "{} | Invalid token: {:?}-{} occured on code line {}",
-          self.line,
-          first_tok,
-          self.current,
-          line!()
+          "Line {} | Found an invalid token in function arguments: `{}`",
+          self.line, first_tok.lexeme
         ));
         Node::new(None)
       }
@@ -276,11 +253,8 @@ impl Parser {
       _ => {
         self.had_error = true;
         self.errors.push(format!(
-          "{} | Invalid token: {:?}-{} occured on code line {}",
-          self.line,
-          sec_tok,
-          self.current,
-          line!()
+          "Line {} | Found an invalid token in function body: `{}`",
+          self.line, sec_tok.lexeme
         ));
         Node::new(Block)
       }
@@ -323,11 +297,8 @@ impl Parser {
       _ => {
         self.had_error = true;
         self.errors.push(format!(
-          "{} | Invalid token: {:?}-{} occured on code line {}",
-          self.line,
-          first_tok,
-          self.current,
-          line!()
+          "Line {} | Found an invalid token in condition: `{}`",
+          self.line, first_tok.lexeme
         ));
         Node::new(None)
       }
@@ -374,11 +345,8 @@ impl Parser {
       _ => {
         self.had_error = true;
         self.errors.push(format!(
-          "{} | Invalid token: {:?}-{} occured on code line {}",
-          self.line,
-          first_tok,
-          self.current,
-          line!()
+          "Line {} | Found invalid token in operation's left expression: `{}`",
+          self.line, first_tok.lexeme,
         ));
         Node::new(None)
       }
@@ -394,11 +362,8 @@ impl Parser {
       _ => {
         self.had_error = true;
         self.errors.push(format!(
-          "{} | Invalid token: {:?}-{} occured on code line {}",
-          self.line,
-          second_tok,
-          self.current,
-          line!()
+          "Line {} | Found invalid token in operation's right expression: `{}`",
+          self.line, first_tok.lexeme,
         ));
         Node::new(None)
       }
@@ -422,11 +387,8 @@ impl Parser {
       _ => {
         self.had_error = true;
         self.errors.push(format!(
-          "{} | Invalid token: {:?}-{} occured on code line {}",
-          self.line,
-          name_tok,
-          self.current,
-          line!()
+          "Line {} | Found invalid token in variable name: `{}`",
+          self.line, name_tok.lexeme
         ));
         return Node::new(None);
       }
@@ -445,11 +407,8 @@ impl Parser {
       _ => {
         self.had_error = true;
         self.errors.push(format!(
-          "{} | Invalid token: {:?}-{} occured on code line {}",
-          self.line,
-          value_tok,
-          self.current,
-          line!()
+          "Line {} | Found invalid token in variable value: `{}`",
+          self.line, value_tok.lexeme
         ));
         return Node::new(None);
       }
@@ -468,7 +427,6 @@ impl Parser {
   }
   fn parse_token(&mut self) {
     let current = self.advance();
-    self.line = current.line;
 
     match current.typ {
       LeftParen => {
@@ -478,11 +436,8 @@ impl Parser {
       _ => {
         self.had_error = true;
         self.errors.push(format!(
-          "{} | Invalid token: {:?}-{} occured on code line {}",
-          self.line,
-          current,
-          self.current,
-          line!()
+          "Line {} | Found an invalid token: `{}`",
+          self.line, current.lexeme
         ));
       }
     }
