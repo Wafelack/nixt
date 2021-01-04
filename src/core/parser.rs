@@ -27,7 +27,6 @@ impl Parser {
     self.current += 1;
     let toret = self.tokens[self.current - 1].clone();
     self.line = toret.line;
-    eprintln!("{} - {:?}", self.current - 1, &toret);
     toret
   }
   fn is_at_end(&self) -> bool {
