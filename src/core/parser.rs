@@ -43,6 +43,7 @@ impl Parser {
       }
       let current = self.advance();
       let to_add = match current.typ {
+        TokenType::Return => self.parse_return(),
         If => self.parse_condition(),
         LeftParen => self.parse_block(ast),
         Let | Const | Set => self.parse_assignement(&current.typ, ast),
@@ -65,6 +66,28 @@ impl Parser {
       }
     }
     toret
+  }
+  fn parse_return(&mut self) -> Node {
+    let to_ret = self.advance();
+
+    let mut master = Node::new(NodeType::Return);
+
+    let value = match to_ret.typ {
+      Identifier(s) => Node::new(NodeIdentifier(s)),
+      Str(s) => Node::new(NodeStr(s)),
+      Number(f) => Node::new(NodeNumber(f)),
+      LeftParen => self.parse_block(false),
+      TokenType::Func => todo!(),
+      _ => {
+        self.had_error = true;
+        self
+          .errors
+          .push(format!("{} | Invalid token: {:?}", self.line, to_ret));
+        Node::new(None)
+      }
+    };
+    master.add_children(&value);
+    master
   }
   fn parse_verif(&mut self, typ: &TokenType) -> Node {
     let mut master = match typ {
