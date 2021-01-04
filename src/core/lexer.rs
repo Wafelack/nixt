@@ -20,7 +20,6 @@ impl Lexer {
         keywords.insert("if".to_owned(), If);
         keywords.insert("nil".to_owned(), Nil);
         keywords.insert("or".to_owned(), Or);
-        keywords.insert("print".to_owned(), Print);
         keywords.insert("ret".to_owned(), Return);
         keywords.insert("true".to_owned(), True);
         keywords.insert("false".to_owned(), False);

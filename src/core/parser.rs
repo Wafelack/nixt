@@ -52,7 +52,7 @@ impl Parser {
         Less | LessEqual | And | Or | Tilde | Equal | Greater | GreaterEqual => {
           self.parse_verif(&current.typ)
         }
-        Identifier(s) => Node::new(NodeIdentifier(s)),
+        Identifier(s) => self.function_call(s),
         _ => {
           self.had_error = true;
           self
@@ -67,6 +67,41 @@ impl Parser {
       }
     }
     toret
+  }
+  fn function_call(&mut self, s: String) -> Node {
+    let mut master = Node::new(NodeIdentifier(s));
+    let mut args: Vec<Node> = vec![];
+
+    loop {
+      if self.is_at_end() || self.peek().unwrap().typ == RightParen {
+        if self.peek().is_some() && self.peek().unwrap().typ == RightParen {
+          self.advance(); // Consume closing char
+        }
+        break;
+      }
+      let current = self.advance();
+
+      let to_add = match &current.typ {
+        Identifier(s) => self.function_call(s.to_owned()),
+        Str(s) => Node::new(NodeStr(s.to_owned())),
+        Number(f) => Node::new(NodeNumber(*f)),
+        LeftParen => self.parse_block(false),
+        True => Node::new(NodeBool(true)),
+        False => Node::new(NodeBool(false)),
+        _ => {
+          self.had_error = true;
+          self
+            .errors
+            .push(format!("{} | Invalid token: {:?}", self.line, current));
+          Node::new(None)
+        }
+      };
+      args.push(to_add);
+    }
+    for arg in args {
+      master.add_children(&arg);
+    }
+    master
   }
   fn parse_return(&mut self) -> Node {
     let to_ret = self.advance();
