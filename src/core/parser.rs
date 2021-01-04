@@ -40,11 +40,6 @@ impl Parser {
       if self.is_at_end() || self.peek().unwrap().typ == RightParen {
         if self.peek().is_some() && self.peek().unwrap().typ == RightParen {
           self.advance(); // Consume closing char
-        } else if self.is_at_end() {
-          self.had_error = true;
-          self
-            .errors
-            .push("Parsing error: unclosed delimiter".to_owned())
         }
         break;
       }
