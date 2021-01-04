@@ -89,12 +89,12 @@ impl Lexer {
             _ => {
                 if c.is_digit(10) {
                     self.number();
-                } else if c.is_alphabetic() {
+                } else if c.is_alphabetic() || c == '_' {
                     self.identifier();
                 } else {
                     self.had_error = true;
                     self.errors
-                        .push(format!("{} | Unexpected character", self.line));
+                        .push(format!("{} | Unexpected character: {}", self.line, c));
                 }
             }
         }
@@ -109,7 +109,7 @@ impl Lexer {
         self.advance(); // consume %
     }
     fn identifier(&mut self) {
-        while self.peek().is_alphanumeric() {
+        while self.peek().is_alphanumeric() || self.peek() == '_' {
             self.advance();
         }
         let copied = self.clone();

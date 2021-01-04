@@ -23,7 +23,6 @@ pub enum TokenType {
     If,
     Nil,
     Or,
-    Print,
     Return,
     True,
     False,

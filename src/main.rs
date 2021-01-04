@@ -5,7 +5,7 @@ mod utils;
 use self::core::lexer::*;
 use self::core::parser::*;
 use std::io::Write;
-use utils::node::{NodeType::*, *};
+use utils::node::*;
 
 fn main() {
     loop {

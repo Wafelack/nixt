@@ -142,7 +142,7 @@ mod test {
           line: 1
         },
         Token {
-          typ: Print,
+          typ: Identifier("print".to_owned()),
           lexeme: "print".to_owned(),
           line: 1
         },
@@ -162,7 +162,7 @@ mod test {
           line: 1
         },
         Token {
-          typ: Print,
+          typ: Identifier("print".to_owned()),
           lexeme: "print".to_owned(),
           line: 1
         },
