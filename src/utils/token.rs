@@ -1,9 +1,5 @@
 #[derive(Debug, Clone, PartialEq)]
 pub enum TokenType {
-    LeftBrace,
-    RightBrace,
-    LeftBracket,
-    RightBracket,
     LeftParen,
     RightParen,
     Str(String),
@@ -24,7 +20,6 @@ pub enum TokenType {
 
     And,
     Func,
-    Else,
     If,
     Nil,
     Or,

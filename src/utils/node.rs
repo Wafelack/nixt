@@ -1,7 +1,7 @@
 #[derive(Debug, Clone)]
 pub enum NodeType {
   Assignement(AssignType),
-  Condition(ConditionType),
+  Condition,
   Operator(OperatorType),
   Check(CheckType),
   Func,
@@ -9,6 +9,7 @@ pub enum NodeType {
   Return,
   Block,
   None,
+  NodeBool(bool),
   NodeNumber(f32),
   NodeStr(String),
   NodeIdentifier(String),
@@ -49,13 +50,6 @@ pub enum AssignType {
   Const,
   Set,
 }
-
-#[derive(Debug, Clone)]
-pub enum ConditionType {
-  If,
-  Else,
-}
-
 #[derive(Debug, Clone)]
 pub enum OperatorType {
   Plus,

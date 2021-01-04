@@ -17,7 +17,6 @@ impl Lexer {
     pub fn new(source: &str) -> Self {
         let mut keywords = BTreeMap::new();
         keywords.insert("func".to_owned(), Func);
-        keywords.insert("else".to_owned(), Else);
         keywords.insert("if".to_owned(), If);
         keywords.insert("nil".to_owned(), Nil);
         keywords.insert("or".to_owned(), Or);
@@ -50,10 +49,6 @@ impl Lexer {
         match c {
             '(' => self.add_token(LeftParen),
             ')' => self.add_token(RightParen),
-            '[' => self.add_token(LeftBracket),
-            ']' => self.add_token(RightBracket),
-            '{' => self.add_token(LeftBrace),
-            '}' => self.add_token(RightBrace),
             ',' => self.add_token(Comma),
             '.' => self.add_token(Dot),
             '-' => self.add_token(Minus),
@@ -80,14 +75,13 @@ impl Lexer {
                     self.add_token(Greater);
                 }
             }
-            '%' => {
-                if self.match_('=') {
-                    self.multi_line_comment();
-                } else {
-                    while self.peek() != '\n' && !self.is_at_end() {
-                        self.advance();
-                    }
+            '#' => {
+                while self.peek() != '\n' && !self.is_at_end() {
+                    self.advance();
                 }
+            }
+            '%' => {
+                self.multi_line_comment();
             }
             ' ' | '\r' | '\t' => {}
             '"' => self.string('"'),
@@ -107,14 +101,13 @@ impl Lexer {
         }
     }
     fn multi_line_comment(&mut self) {
-        while self.peek() != '=' && self.peek_next() != '%' && !self.is_at_end() {
+        while self.peek() != '%' && !self.is_at_end() {
             if self.peek() == '\n' {
                 self.line += 1;
             }
             self.advance();
         }
-        self.advance();
-        self.advance(); // Skip =%
+        self.advance(); // consume %
     }
     fn identifier(&mut self) {
         while self.peek().is_alphanumeric() {

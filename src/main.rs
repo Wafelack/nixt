@@ -1,4 +1,5 @@
 mod core;
+mod tests;
 mod utils;
 
 use self::core::lexer::*;
