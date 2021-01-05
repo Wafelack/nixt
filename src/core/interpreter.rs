@@ -15,8 +15,8 @@ pub fn interpret_operation(block: &Node) -> Value {
   }
   let operator_node = &content[0];
   let operator = match operator_node.get_type() {
-    NodeType::Operator(op) => op,
     NodeType::Block => return interpret_operation(&operator_node),
+    NodeType::Operator(op) => op,
     _ => return Value::Nil,
   };
 
@@ -43,9 +43,9 @@ pub fn interpret_operation(block: &Node) -> Value {
 
   match operator {
     OperatorType::Plus => add(lhs, rhs),
-    /*OperatorType::Minus => sub(lhs, rhs),
+    OperatorType::Minus => sub(lhs, rhs),
     OperatorType::Times => times(lhs, rhs),
-    OperatorType::Div => div(lhs, rhs),*/
+    OperatorType::Div => div(lhs, rhs),
     _ => Value::Nil,
   }
 }
@@ -53,15 +53,43 @@ pub fn interpret_operation(block: &Node) -> Value {
 fn add(lhs: Value, rhs: Value) -> Value {
   match lhs {
     Value::String(lh) => match rhs {
-      Value::String(rh) => return Value::String(format!("{}{}", lh, rh)),
-      Value::Number(rh) => return Value::String(format!("{}{}", lh, rh)),
-      _ => return Value::Nil,
+      Value::String(rh) => Value::String(format!("{}{}", lh, rh)),
+      _ => Value::Nil,
     },
     Value::Number(lh) => match rhs {
-      Value::Number(rh) => return Value::Number(lh + rh),
-      Value::String(rh) => return Value::String(format!("{}{}", lh, rh)),
-      _ => return Value::Nil,
+      Value::Number(rh) => Value::Number(lh + rh),
+      _ => Value::Nil,
     },
-    _ => return Value::Nil,
+    _ => Value::Nil,
+  }
+}
+
+fn sub(lhs: Value, rhs: Value) -> Value {
+  match lhs {
+    Value::Number(lh) => match rhs {
+      Value::Number(rh) => Value::Number(lh - rh),
+      _ => Value::Nil,
+    },
+    _ => Value::Nil,
+  }
+}
+
+fn times(lhs: Value, rhs: Value) -> Value {
+  match lhs {
+    Value::Number(lh) => match rhs {
+      Value::Number(rh) => Value::Number(lh * rh),
+      _ => Value::Nil,
+    },
+    _ => Value::Nil,
+  }
+}
+
+fn div(lhs: Value, rhs: Value) -> Value {
+  match lhs {
+    Value::Number(lh) => match rhs {
+      Value::Number(rh) => Value::Number(lh / rh),
+      _ => Value::Nil,
+    },
+    _ => Value::Nil,
   }
 }

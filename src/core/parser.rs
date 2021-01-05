@@ -164,14 +164,14 @@ impl Parser {
   }
   fn parse_verif(&mut self, typ: &TokenType) -> Node {
     let mut master = match typ {
-      Less => Node::new(Check(CheckType::Less)),
-      LessEqual => Node::new(Check(CheckType::LessEqual)),
-      Greater => Node::new(Check(CheckType::Greater)),
-      GreaterEqual => Node::new(Check(CheckType::GreaterEqual)),
-      Equal => Node::new(Check(CheckType::Equal)),
-      Tilde => Node::new(Check(CheckType::NotEqual)),
-      And => Node::new(Check(CheckType::And)),
-      _ => Node::new(Check(CheckType::Or)),
+      Less => Node::new(Operator(OperatorType::Less)),
+      LessEqual => Node::new(Operator(OperatorType::LessEqual)),
+      Greater => Node::new(Operator(OperatorType::Greater)),
+      GreaterEqual => Node::new(Operator(OperatorType::GreaterEqual)),
+      Equal => Node::new(Operator(OperatorType::Equal)),
+      Tilde => Node::new(Operator(OperatorType::NotEqual)),
+      And => Node::new(Operator(OperatorType::And)),
+      _ => Node::new(Operator(OperatorType::Or)),
     };
 
     let lhs_tok = self.advance();

@@ -3,7 +3,6 @@ pub enum NodeType {
   Assignement(AssignType),
   Condition,
   Operator(OperatorType),
-  Check(CheckType),
   Func,
   Loop,
   Return,
@@ -40,18 +39,6 @@ impl Node {
 }
 
 #[derive(Debug, Clone)]
-pub enum CheckType {
-  Less,
-  LessEqual,
-  Greater,
-  GreaterEqual,
-  Equal,
-  NotEqual,
-  And,
-  Or,
-}
-
-#[derive(Debug, Clone)]
 pub enum AssignType {
   Let,
   Const,
@@ -63,4 +50,12 @@ pub enum OperatorType {
   Minus,
   Times,
   Div,
+  Less,
+  LessEqual,
+  Greater,
+  GreaterEqual,
+  Equal,
+  NotEqual,
+  And,
+  Or,
 }

@@ -1,20 +1,21 @@
 use crate::utils::node::Node;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct StackElement {
   typ: VariableType,
   value: Value,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum VariableType {
   Constant,
   Mutable,
 }
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum Value {
   Number(f32),
   Nil,
+  Bool(bool),
   String(String),
   List(Vec<Value>),
   Block(Node), // Only for functions (and maybe loops)
