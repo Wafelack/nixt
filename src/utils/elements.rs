@@ -2,9 +2,9 @@ use crate::utils::node::Node;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct StackElement {
-  typ: VariableType,
-  name: String,
-  value: Value,
+  pub typ: VariableType,
+  pub name: String,
+  pub value: Value,
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -19,7 +19,13 @@ pub enum Value {
   Bool(bool),
   String(String),
   List(Vec<Value>),
-  Block(Node), // Only for functions (and maybe loops)
+  Func(Func), // Only for functions (and maybe loops)
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct Func {
+  args: Vec<String>,
+  body: Node,
 }
 
 impl std::fmt::Display for Value {

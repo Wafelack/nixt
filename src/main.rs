@@ -31,7 +31,8 @@ fn main() {
             }
             panic!("{} parsing errors occured !", errs.len());
         }
-        let interpreted = interpret_operation(&ast);
-        println!("{}", interpreted);
+        let mut interpreter = Interpreter::new(&ast);
+        interpreter.interpret_blocks();
+        println!("{:?}", interpreter.stack);
     }
 }
