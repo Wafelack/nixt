@@ -51,6 +51,7 @@ pub fn interpret_operation(block: &Node) -> Value {
     OperatorType::Div => div(lhs, rhs),
     OperatorType::And => and(lhs, rhs),
     OperatorType::Or => or(lhs, rhs),
+    OperatorType::Equal => eq(lhs, rhs),
     OperatorType::NotEqual => neq(lhs, rhs),
     _ => Value::Nil,
   }
@@ -75,6 +76,27 @@ fn neq(lhs: Value, rhs: Value) -> Value {
     Value::Number(lh) => match rhs {
       Value::Number(rh) => Value::Bool(lh != rh),
       _ => Value::Bool(true),
+    },
+    Value::Bool(lh) => match rhs {
+      Value::Bool(rh) => Value::Bool(lh != rh),
+      _ => Value::Bool(true),
+    },
+    _ => todo!(),
+  }
+}
+fn eq(lhs: Value, rhs: Value) -> Value {
+  match lhs {
+    Value::String(lh) => match rhs {
+      Value::String(rh) => Value::Bool(lh == rh),
+      _ => Value::Bool(false),
+    },
+    Value::Number(lh) => match rhs {
+      Value::Number(rh) => Value::Bool(lh == rh),
+      _ => Value::Bool(false),
+    },
+    Value::Bool(lh) => match rhs {
+      Value::Bool(rh) => Value::Bool(lh == rh),
+      _ => Value::Bool(false),
     },
     _ => todo!(),
   }
