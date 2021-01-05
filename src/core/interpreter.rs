@@ -55,7 +55,7 @@ impl Interpreter {
         NodeType::Block => {
           self.interpret_block((*current).clone());
         }
-        NodeType::Operator(op) => return self.interpret_operation(current),
+        NodeType::Operator(_) => return self.interpret_operation(current),
         NodeType::Assignement(t) => {
           self.interpret_assignement(current, t);
         }
