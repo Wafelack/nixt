@@ -441,6 +441,7 @@ impl Parser {
       Number(f) => Node::new(NodeNumber(f)),
       Str(s) => Node::new(NodeStr(s)),
       Identifier(s) => Node::new(NodeIdentifier(s)),
+      Nil => Node::new(None),
       True => Node::new(NodeBool(true)),
       False => Node::new(NodeBool(false)),
       Plus | Minus | Star | Slash => self.parse_op(&value_tok.typ),

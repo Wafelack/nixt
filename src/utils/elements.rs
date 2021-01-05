@@ -7,11 +7,32 @@ pub struct StackElement {
   pub value: Value,
 }
 
+impl std::fmt::Display for StackElement {
+  fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+    write!(
+      f,
+      "@type: {}, @name: {}, @value: {}",
+      self.typ, self.name, self.value
+    )?;
+    Ok(())
+  }
+}
+
 #[derive(Debug, Clone, PartialEq)]
 pub enum VariableType {
   Constant,
   Mutable,
 }
+impl std::fmt::Display for VariableType {
+  fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+    match self {
+      VariableType::Constant => write!(f, "constant")?,
+      _ => write!(f, "mutable")?,
+    }
+    Ok(())
+  }
+}
+
 #[derive(Debug, Clone, PartialEq)]
 pub enum Value {
   Number(f32),
@@ -35,7 +56,7 @@ impl std::fmt::Display for Value {
         write!(f, "{}", n)?;
       }
       Value::String(s) => {
-        write!(f, "{}", s)?;
+        write!(f, "\"{}\"", s)?;
       }
       Value::List(v) => {
         write!(f, "{:?}", v)?;

@@ -32,6 +32,8 @@ impl Interpreter {
       NodeType::NodeStr(s) => Value::String(s.to_owned()),
       NodeType::NodeNumber(n) => Value::Number(*n),
       NodeType::NodeBool(b) => Value::Bool(*b),
+      NodeType::None => Value::Nil,
+      NodeType::Block => self.interpret_block(children[1].clone()),
       _ => todo!(),
     };
 
@@ -47,16 +49,15 @@ impl Interpreter {
   pub fn interpret_block(&mut self, block: Node) -> Value {
     let mut i = 0usize;
     let children = block.get_child();
-    println!("{:?}", children);
     while i < children.len() {
       let current = &children[i];
       match current.get_type() {
         NodeType::Block => {
           self.interpret_block((*current).clone());
         }
+        NodeType::Operator(op) => return self.interpret_operation(current),
         NodeType::Assignement(t) => {
           self.interpret_assignement(current, t);
-          println!("Triggered");
         }
         _ => {}
       }
@@ -66,23 +67,10 @@ impl Interpreter {
   }
 
   pub fn interpret_operation(&mut self, block: &Node) -> Value {
-    let content = match block.get_type() {
-      NodeType::Block => block.get_child(),
+    let (operator, child) = match block.get_type() {
+      NodeType::Operator(op) => (op, block.get_child()),
       _ => return Value::Nil,
     };
-    if content.len() < 1 {
-      return Value::Nil;
-    }
-    let operator_node = &content[0];
-    let operator = match operator_node.get_type() {
-      NodeType::Block => return self.interpret_operation(&operator_node),
-      NodeType::Operator(op) => op,
-      _ => return Value::Nil,
-    };
-    if content[0].get_child().len() < 2 {
-      return Value::Nil;
-    }
-    let child = content[0].get_child();
     let lhs = match &child[0].get_type() {
       NodeType::NodeNumber(f) => Value::Number(*f),
       NodeType::NodeStr(s) => Value::String(s.to_owned()),
