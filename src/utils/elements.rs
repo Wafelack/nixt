@@ -1,17 +1,17 @@
 use crate::utils::node::Node;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct StackElement {
   typ: VariableType,
   value: Value,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum VariableType {
   Constant,
   Mutable,
 }
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum Value {
   Number(f32),
   Nil,

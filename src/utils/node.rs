@@ -1,4 +1,4 @@
-#[derive(Debug, Clone)]
+#[derive(Debug, PartialEq, Clone)]
 pub enum NodeType {
   Assignement(AssignType),
   Condition,
@@ -14,7 +14,7 @@ pub enum NodeType {
   NodeIdentifier(String),
   FunctionCall(String),
 }
-#[derive(Debug, Clone)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct Node {
   node_type: NodeType,
   child: Vec<Node>,
@@ -38,13 +38,13 @@ impl Node {
   }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum AssignType {
   Let,
   Const,
   Set,
 }
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum OperatorType {
   Plus,
   Minus,

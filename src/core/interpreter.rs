@@ -50,10 +50,9 @@ pub fn interpret_operation(block: &Node) -> Value {
     OperatorType::Times => times(lhs, rhs),
     OperatorType::Div => div(lhs, rhs),
     OperatorType::And => and(lhs, rhs),
-    _ => {
-      println!("foo");
-      Value::Nil
-    }
+    OperatorType::Or => or(lhs, rhs),
+    OperatorType::NotEqual => neq(lhs, rhs),
+    _ => Value::Nil,
   }
 }
 
@@ -61,6 +60,30 @@ fn and(lhs: Value, rhs: Value) -> Value {
   match lhs {
     Value::Bool(lh) => match rhs {
       Value::Bool(rh) => Value::Bool(lh && rh),
+      _ => Value::Bool(false),
+    },
+    _ => Value::Bool(false),
+  }
+}
+
+fn neq(lhs: Value, rhs: Value) -> Value {
+  match lhs {
+    Value::String(lh) => match rhs {
+      Value::String(rh) => Value::Bool(lh != rh),
+      _ => Value::Bool(true),
+    },
+    Value::Number(lh) => match rhs {
+      Value::Number(rh) => Value::Bool(lh != rh),
+      _ => Value::Bool(true),
+    },
+    _ => todo!(),
+  }
+}
+
+fn or(lhs: Value, rhs: Value) -> Value {
+  match lhs {
+    Value::Bool(lh) => match rhs {
+      Value::Bool(rh) => Value::Bool(lh || rh),
       _ => Value::Bool(false),
     },
     _ => Value::Bool(false),
