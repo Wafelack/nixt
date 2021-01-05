@@ -53,6 +53,7 @@ pub fn interpret_operation(block: &Node) -> Value {
     OperatorType::Or => or(lhs, rhs),
     OperatorType::Equal => eq(lhs, rhs),
     OperatorType::NotEqual => neq(lhs, rhs),
+    OperatorType::Less => less(lhs, rhs),
     _ => Value::Nil,
   }
 }
@@ -64,6 +65,16 @@ fn and(lhs: Value, rhs: Value) -> Value {
       _ => Value::Bool(false),
     },
     _ => Value::Bool(false),
+  }
+}
+
+fn less(lhs: Value, rhs: Value) -> Value {
+  match lhs {
+    Value::Number(lh) => match rhs {
+      Value::Number(rh) => Value::Bool(lh < rh),
+      _ => Value::Nil,
+    },
+    _ => Value::Nil,
   }
 }
 
