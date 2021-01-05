@@ -13,6 +13,7 @@ pub enum NodeType {
   NodeNumber(f32),
   NodeStr(String),
   NodeIdentifier(String),
+  FunctionCall(String),
 }
 #[derive(Debug, Clone)]
 pub struct Node {

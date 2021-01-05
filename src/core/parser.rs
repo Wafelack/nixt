@@ -22,6 +22,9 @@ impl Parser {
       errors: vec![],
       line: 1,
     }
+    // An absolutely dirty hack, but i really don't know how to do without it
+    // So it will not be fixed
+    // Who cares ? Users don't read the docs, so they won't read the code
   }
   fn advance(&mut self) -> Token {
     self.current += 1;
@@ -73,7 +76,7 @@ impl Parser {
   }
 
   fn function_call(&mut self, s: String) -> Node {
-    let mut master = Node::new(NodeIdentifier(s));
+    let mut master = Node::new(FunctionCall(s));
     let mut args: Vec<Node> = vec![];
 
     loop {

@@ -2,6 +2,7 @@ mod core;
 mod tests;
 mod utils;
 
+use self::core::interpreter::*;
 use self::core::lexer::*;
 use self::core::parser::*;
 use std::io::Write;
@@ -31,7 +32,12 @@ fn main() {
             }
             panic!("{} parsing errors occured !", errs.len());
         }
-        print_node(&ast, 0);
+        let interpreted = interpret_operation(&ast);
+        if interpreted.is_some() {
+            println!("{}", interpreted.unwrap());
+        } else {
+            print_node(&ast, 0);
+        }
     }
 }
 
