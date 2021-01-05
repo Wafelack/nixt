@@ -3,6 +3,7 @@ use crate::utils::node::Node;
 #[derive(Debug, Clone, PartialEq)]
 pub struct StackElement {
   typ: VariableType,
+  name: String,
   value: Value,
 }
 

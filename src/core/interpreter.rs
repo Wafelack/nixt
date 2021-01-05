@@ -1,8 +1,10 @@
 use crate::utils::{elements::*, node::*};
+use std::mem;
 
 pub struct Interpreter {
   stack: Vec<StackElement>,
   ast: Node,
+  current: usize,
 }
 
 pub fn interpret_operation(block: &Node) -> Value {
@@ -112,6 +114,9 @@ fn leeq(lhs: Value, rhs: Value) -> Value {
 }
 
 fn neq(lhs: Value, rhs: Value) -> Value {
+  if mem::discriminant(&lhs) != mem::discriminant(&rhs) {
+    return Value::Bool(true);
+  }
   match lhs {
     Value::String(lh) => match rhs {
       Value::String(rh) => Value::Bool(lh != rh),
@@ -129,6 +134,9 @@ fn neq(lhs: Value, rhs: Value) -> Value {
   }
 }
 fn eq(lhs: Value, rhs: Value) -> Value {
+  if mem::discriminant(&lhs) != mem::discriminant(&rhs) {
+    return Value::Bool(false);
+  }
   match lhs {
     Value::String(lh) => match rhs {
       Value::String(rh) => Value::Bool(lh == rh),
