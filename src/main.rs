@@ -6,7 +6,6 @@ use self::core::interpreter::*;
 use self::core::lexer::*;
 use self::core::parser::*;
 use std::io::Write;
-use utils::node::*;
 
 fn main() {
     loop {
@@ -33,10 +32,6 @@ fn main() {
             panic!("{} parsing errors occured !", errs.len());
         }
         let interpreted = interpret_operation(&ast);
-        if interpreted.is_some() {
-            println!("{}", interpreted.unwrap());
-        } else {
-            println!("{}", ast);
-        }
+        println!("{}", interpreted);
     }
 }

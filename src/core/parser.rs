@@ -26,7 +26,7 @@ fn gen_indents(amount: usize) -> String {
 
 impl std::fmt::Display for Node {
   fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-    write!(f, "{}", stringify(self, 0));
+    write!(f, "{}", stringify(self, 0))?;
     Ok(())
   }
 }
