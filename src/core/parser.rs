@@ -3,6 +3,34 @@ use crate::utils::{
   token::{TokenType::*, *},
 };
 
+fn stringify(node: &Node, indentations: usize) -> String {
+  let mut toret = String::new();
+  toret.push_str("{\n");
+  for children in node.get_child() {
+    toret.push_str(&format!("{}@type : ", gen_indents(indentations)));
+    toret.push_str(&format!("{:?}\n", children.get_type()));
+    toret.push_str(&format!("{}@children : ", gen_indents(indentations)));
+    toret.push_str(&stringify(&children, indentations + 1));
+  }
+  toret.push_str(&format!("{}}}\n", gen_indents(indentations)));
+  toret
+}
+
+fn gen_indents(amount: usize) -> String {
+  let mut toret = String::new();
+  for _ in 0..amount {
+    toret.push_str("  ");
+  }
+  toret
+}
+
+impl std::fmt::Display for Node {
+  fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+    write!(f, "{}", stringify(self, 0));
+    Ok(())
+  }
+}
+
 #[derive(Debug)]
 pub struct Parser {
   tokens: Vec<Token>,

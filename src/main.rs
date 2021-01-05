@@ -36,26 +36,7 @@ fn main() {
         if interpreted.is_some() {
             println!("{}", interpreted.unwrap());
         } else {
-            print_node(&ast, 0);
+            println!("{}", ast);
         }
     }
-}
-
-fn print_node(node: &Node, indentations: usize) {
-    println!("{{");
-    for children in node.get_child() {
-        print!("{}@type : ", print_indents(indentations));
-        println!("{:?}", children.get_type());
-        print!("{}@children : ", print_indents(indentations));
-        print_node(&children, indentations + 1);
-    }
-    println!("{}}}", print_indents(indentations));
-}
-
-fn print_indents(amount: usize) -> String {
-    let mut toret = String::new();
-    for _ in 0..amount {
-        toret.push_str("  ");
-    }
-    toret
 }

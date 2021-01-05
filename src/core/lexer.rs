@@ -89,7 +89,7 @@ impl Lexer {
             _ => {
                 if c.is_digit(10) {
                     self.number();
-                } else if c.is_alphabetic() || c == '_' {
+                } else if is_identifier_allowed(c) {
                     self.identifier();
                 } else {
                     self.had_error = true;
@@ -109,7 +109,7 @@ impl Lexer {
         self.advance(); // consume %
     }
     fn identifier(&mut self) {
-        while self.peek().is_alphanumeric() || self.peek() == '_' {
+        while is_identifier_allowed(self.peek()) {
             self.advance();
         }
         let copied = self.clone();
@@ -208,4 +208,8 @@ impl Lexer {
             .push(Token::new(TokenType::Eof, "".to_owned(), self.line));
         self.tokens.clone()
     }
+}
+
+fn is_identifier_allowed(c: char) -> bool {
+    c.is_alphanumeric() || c == '_' || c == ':'
 }
