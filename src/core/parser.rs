@@ -80,10 +80,8 @@ impl Parser {
         While => self.parse_loop(),
         LeftParen => self.parse_block(ast),
         Let | Const | Set => self.parse_assignement(&current.typ),
-        Plus | Minus | Star | Slash => self.parse_op(&current.typ),
-        Less | LessEqual | And | Or | Tilde | Equal | Greater | GreaterEqual => {
-          self.parse_verif(&current.typ)
-        }
+        Plus | Minus | Star | Slash | Less | LessEqual | And | Or | Tilde | Equal | Greater
+        | GreaterEqual => self.parse_op(&current.typ),
         TokenType::Func => self.parse_func(),
         Identifier(s) => self.function_call(s),
         _ => {
@@ -371,6 +369,8 @@ impl Parser {
     let first = match first_tok.typ {
       LeftParen => self.parse_block(false),
       Number(f) => Node::new(NodeNumber(f)),
+      True => Node::new(NodeBool(true)),
+      False => Node::new(NodeBool(false)),
       Str(s) => Node::new(NodeStr(s)),
       Identifier(s) => Node::new(NodeIdentifier(s)),
       _ => {
@@ -389,6 +389,8 @@ impl Parser {
       LeftParen => self.parse_block(false),
       Number(f) => Node::new(NodeNumber(f)),
       Str(s) => Node::new(NodeStr(s)),
+      True => Node::new(NodeBool(true)),
+      False => Node::new(NodeBool(false)),
       Identifier(s) => Node::new(NodeIdentifier(s)),
       _ => {
         self.had_error = true;
@@ -404,6 +406,14 @@ impl Parser {
       Plus => Node::new(Operator(OperatorType::Plus)),
       Minus => Node::new(Operator(OperatorType::Minus)),
       Star => Node::new(Operator(OperatorType::Times)),
+      And => Node::new(Operator(OperatorType::And)),
+      Or => Node::new(Operator(OperatorType::Or)),
+      Equal => Node::new(Operator(OperatorType::Equal)),
+      Greater => Node::new(Operator(OperatorType::Greater)),
+      GreaterEqual => Node::new(Operator(OperatorType::GreaterEqual)),
+      Less => Node::new(Operator(OperatorType::Less)),
+      LessEqual => Node::new(Operator(OperatorType::LessEqual)),
+      Tilde => Node::new(Operator(OperatorType::NotEqual)),
       _ => Node::new(Operator(OperatorType::Div)),
     };
     master.add_children(&first);
