@@ -33,6 +33,9 @@ impl std::fmt::Display for Value {
       Value::List(v) => {
         write!(f, "{:?}", v)?;
       }
+      Value::Bool(b) => {
+        write!(f, "{}", b)?;
+      }
       _ => {
         write!(f, "nil")?;
       }

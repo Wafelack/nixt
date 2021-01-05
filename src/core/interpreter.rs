@@ -28,8 +28,9 @@ pub fn interpret_operation(block: &Node) -> Value {
   let lhs = match &child[0].get_type() {
     NodeType::NodeNumber(f) => Value::Number(*f),
     NodeType::NodeStr(s) => Value::String(s.to_owned()),
-    NodeType::NodeIdentifier(s) => todo!(),
     NodeType::NodeBool(b) => Value::Bool(*b),
+    NodeType::NodeIdentifier(s) => todo!(),
+
     NodeType::Block => interpret_operation(&child[0]),
     _ => Value::Nil,
   };
@@ -37,14 +38,12 @@ pub fn interpret_operation(block: &Node) -> Value {
   let rhs = match &child[1].get_type() {
     NodeType::NodeNumber(f) => Value::Number(*f),
     NodeType::NodeStr(s) => Value::String(s.to_owned()),
-    NodeType::NodeIdentifier(s) => todo!(),
     NodeType::NodeBool(b) => Value::Bool(*b),
+    NodeType::NodeIdentifier(s) => todo!(),
+
     NodeType::Block => interpret_operation(&child[1]),
     _ => Value::Nil,
   };
-
-  println!("Operator: {:?} ; Lhs: {:?} ; Rhs: {:?}", operator, lhs, rhs);
-
   match operator {
     OperatorType::Plus => add(lhs, rhs),
     OperatorType::Minus => sub(lhs, rhs),
@@ -61,7 +60,7 @@ pub fn interpret_operation(block: &Node) -> Value {
 fn and(lhs: Value, rhs: Value) -> Value {
   match lhs {
     Value::Bool(lh) => match rhs {
-      Value::Bool(rh) => Value::Bool(lh == rh),
+      Value::Bool(rh) => Value::Bool(lh && rh),
       _ => Value::Bool(false),
     },
     _ => Value::Bool(false),
