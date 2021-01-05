@@ -16,15 +16,15 @@ impl Interpreter {
   pub fn interpret_blocks(&mut self) {
     self.interpret_block(self.ast.clone());
   }
-  fn interpret_assignement(&mut self, current: &Node, typ: AssignType) {
+  fn interpret_assignement(&mut self, current: &Node, typ: AssignType) -> Value {
     let children = current.get_child();
     if children.len() < 2 {
-      return;
+      return Value::Nil;
     }
     let first_typ = &children[0].get_type();
     let name = match first_typ {
       NodeType::NodeIdentifier(s) => s,
-      _ => return,
+      _ => return Value::Nil,
     };
 
     let value = match &children[1].get_type() {
@@ -45,6 +45,7 @@ impl Interpreter {
       },
       value: value,
     });
+    Value::Nil
   }
   pub fn interpret_block(&mut self, block: Node) -> Value {
     let mut i = 0usize;
@@ -53,7 +54,7 @@ impl Interpreter {
       let current = &children[i];
       match current.get_type() {
         NodeType::Block => {
-          self.interpret_block((*current).clone());
+          return self.interpret_block((*current).clone());
         }
         NodeType::Operator(_) => return self.interpret_operation(current),
         NodeType::Assignement(t) => {
@@ -76,7 +77,7 @@ impl Interpreter {
       NodeType::NodeStr(s) => Value::String(s.to_owned()),
       NodeType::NodeBool(b) => Value::Bool(*b),
       NodeType::NodeIdentifier(s) => todo!(),
-      NodeType::Block => self.interpret_operation(&child[0]),
+      NodeType::Block => self.interpret_block(child[0].clone()),
       _ => Value::Nil,
     };
     let rhs = match &child[1].get_type() {
@@ -84,7 +85,7 @@ impl Interpreter {
       NodeType::NodeStr(s) => Value::String(s.to_owned()),
       NodeType::NodeBool(b) => Value::Bool(*b),
       NodeType::NodeIdentifier(s) => todo!(),
-      NodeType::Block => self.interpret_operation(&child[1]),
+      NodeType::Block => self.interpret_block(child[1].clone()),
       _ => Value::Nil,
     };
     match operator {
