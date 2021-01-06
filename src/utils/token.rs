@@ -1,6 +1,8 @@
 #[derive(Debug, Clone, PartialEq)]
 pub enum TokenType {
     LeftParen,
+    LeftBrace,
+    RightBrace,
     RightParen,
     Str(String),
     Identifier(String),

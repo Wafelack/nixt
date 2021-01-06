@@ -2,7 +2,6 @@ mod core;
 mod tests;
 mod utils;
 
-use self::core::interpreter::*;
 use self::core::lexer::*;
 use self::core::parser::*;
 use std::io::Write;
@@ -24,6 +23,7 @@ fn main() {
         }
         let mut parser = Parser::new(toks);
         let ast = parser.parse();
+        println!("{}", ast);
         if parser.had_error() {
             let errs = parser.get_errors();
             for error in &errs {
@@ -31,6 +31,5 @@ fn main() {
             }
             panic!("{} parsing errors occured !", errs.len());
         }
-        println!("{}", ast);
     }
 }

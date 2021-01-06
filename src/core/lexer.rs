@@ -46,6 +46,8 @@ impl Lexer {
         let c = self.advance();
 
         match c {
+            '{' => self.add_token(LeftBrace),
+            '}' => self.add_token(RightBrace),
             '(' => self.add_token(LeftParen),
             ')' => self.add_token(RightParen),
             ',' => self.add_token(Comma),

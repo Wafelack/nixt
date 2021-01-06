@@ -3,34 +3,6 @@ use crate::utils::{
   token::{TokenType::*, *},
 };
 
-fn stringify(node: &Node, indentations: usize) -> String {
-  let mut toret = String::new();
-  toret.push_str("{\n");
-  for children in node.get_child() {
-    toret.push_str(&format!("{}@type : ", gen_indents(indentations)));
-    toret.push_str(&format!("{:?}\n", children.get_type()));
-    toret.push_str(&format!("{}@children : ", gen_indents(indentations)));
-    toret.push_str(&stringify(&children, indentations + 1));
-  }
-  toret.push_str(&format!("{}}}\n", gen_indents(indentations)));
-  toret
-}
-
-fn gen_indents(amount: usize) -> String {
-  let mut toret = String::new();
-  for _ in 0..amount {
-    toret.push_str("  ");
-  }
-  toret
-}
-
-impl std::fmt::Display for Node {
-  fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-    write!(f, "{}", stringify(self, 0))?;
-    Ok(())
-  }
-}
-
 #[derive(Debug)]
 pub struct Parser {
   tokens: Vec<Token>,
@@ -50,9 +22,6 @@ impl Parser {
       errors: vec![],
       line: 1,
     }
-    // An absolutely dirty hack, but i really don't know how to do without it
-    // So it will not be fixed
-    // Who cares ? Users don't read the docs, so they won't read the code
   }
   fn advance(&mut self) -> Token {
     self.current += 1;
@@ -78,7 +47,46 @@ impl Parser {
         TokenType::Return => self.parse_return(),
         If => self.parse_condition(),
         While => self.parse_loop(),
+        LeftBrace => self.parse_scope(ast),
         LeftParen => self.parse_block(ast),
+        Let | Const | Set => self.parse_assignement(&current.typ),
+        Plus | Minus | Star | Slash | Less | LessEqual | And | Or | Tilde | Equal | Greater
+        | GreaterEqual => self.parse_op(&current.typ),
+        TokenType::Func => self.parse_func(),
+        Identifier(s) => self.function_call(s),
+        _ => {
+          self.had_error = true;
+          self.errors.push(format!(
+            "Line {} | Found an invalid token in block parsing: `{}`",
+            self.line, current.lexeme,
+          ));
+          Node::new(None)
+        }
+      };
+      toret.add_children(&to_add);
+      if ast {
+        self.ast.add_children(&toret);
+      }
+    }
+    toret
+  }
+  fn parse_scope(&mut self, ast: bool) -> Node {
+    let mut toret = Node::new(Scope);
+
+    loop {
+      if self.is_at_end() || self.peek().unwrap().typ == RightBrace {
+        if self.peek().is_some() && self.peek().unwrap().typ == RightBrace {
+          self.advance(); // Consume closing char
+        }
+        break;
+      }
+      let current = self.advance();
+      let to_add = match current.typ {
+        TokenType::Return => self.parse_return(),
+        If => self.parse_condition(),
+        While => self.parse_loop(),
+        LeftParen => self.parse_block(ast),
+        LeftBrace => self.parse_scope(ast),
         Let | Const | Set => self.parse_assignement(&current.typ),
         Plus | Minus | Star | Slash | Less | LessEqual | And | Or | Tilde | Equal | Greater
         | GreaterEqual => self.parse_op(&current.typ),
@@ -160,72 +168,6 @@ impl Parser {
     master.add_children(&value);
     master
   }
-  fn parse_verif(&mut self, typ: &TokenType) -> Node {
-    let mut master = match typ {
-      Less => Node::new(Operator(OperatorType::Less)),
-      LessEqual => Node::new(Operator(OperatorType::LessEqual)),
-      Greater => Node::new(Operator(OperatorType::Greater)),
-      GreaterEqual => Node::new(Operator(OperatorType::GreaterEqual)),
-      Equal => Node::new(Operator(OperatorType::Equal)),
-      Tilde => Node::new(Operator(OperatorType::NotEqual)),
-      And => Node::new(Operator(OperatorType::And)),
-      _ => Node::new(Operator(OperatorType::Or)),
-    };
-
-    let lhs_tok = self.advance();
-
-    let lhs = match &lhs_tok.typ {
-      LeftParen => self.parse_block(false),
-      Number(f) => Node::new(NodeNumber(*f)),
-      Str(s) => Node::new(NodeStr((*s).clone())),
-      True | False => {
-        if &lhs_tok.typ == &True {
-          Node::new(NodeBool(true))
-        } else {
-          Node::new(NodeBool(false))
-        }
-      }
-      Identifier(s) => Node::new(NodeIdentifier(s.to_owned())),
-      TokenType::Func => self.parse_func(),
-      _ => {
-        self.had_error = true;
-        self.errors.push(format!(
-          "Line {} | Found an invalid token in condition: `{}`",
-          self.line, lhs_tok.lexeme,
-        ));
-        Node::new(None)
-      }
-    };
-
-    let rhs_tok = self.advance();
-
-    let rhs = match &rhs_tok.typ {
-      LeftParen => self.parse_block(false),
-      Number(f) => Node::new(NodeNumber(*f)),
-      Str(s) => Node::new(NodeStr((*s).clone())),
-      True | False => {
-        if &rhs_tok.typ == &True {
-          Node::new(NodeBool(true))
-        } else {
-          Node::new(NodeBool(false))
-        }
-      }
-      Identifier(s) => Node::new(NodeIdentifier(s.to_owned())),
-      TokenType::Func => self.parse_func(),
-      _ => {
-        self.had_error = true;
-        self.errors.push(format!(
-          "Line {} | Found an invalid token in condition: `{}`",
-          self.line, rhs_tok.lexeme,
-        ));
-        Node::new(None)
-      }
-    };
-
-    master.add_children(&lhs);
-    master.add_children(&rhs);
-    master
-  }
   fn parse_loop(&mut self) -> Node {
     let mut master = Node::new(Loop);
     let first_tok = self.advance();
@@ -245,7 +187,7 @@ impl Parser {
 
     let body_tok = self.advance();
     let body = match &body_tok.typ {
-      LeftParen => self.parse_block(false),
+      LeftBrace => self.parse_scope(false),
       _ => {
         self.had_error = true;
         self.errors.push(format!(
@@ -278,7 +220,7 @@ impl Parser {
     };
     let sec_tok = self.advance();
     let body = match &sec_tok.typ {
-      LeftParen => self.parse_block(false),
+      LeftBrace => self.parse_scope(false),
       _ => {
         self.had_error = true;
         self.errors.push(format!(
@@ -474,6 +416,10 @@ impl Parser {
       LeftParen => {
         let mut blck = Node::new(Block);
         blck.add_children(&self.parse_block(true));
+      }
+      LeftBrace => {
+        let mut blck = Node::new(Scope);
+        blck.add_children(&self.parse_scope(true));
       }
       _ => {
         self.had_error = true;
