@@ -2,7 +2,7 @@
 
   Nixt
   ---
-  Nixt is an interpreted programming language written in Rust
+  Nixt is an interpreted lisp inspired programming language written in Rust
 
 </div>
 

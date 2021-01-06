@@ -7,191 +7,149 @@ mod test {
     utils::token::{TokenType::*, *},
   };
 
-  #[test]
-  fn parsing() -> Result<(), ()> {
-    let to_parse = "(let foo 5)";
-    let mut lexer = Lexer::new(to_parse);
+  fn get_ast(code: &str) -> Result<String, String> {
+    let mut lexer = Lexer::new(code);
     let tokens = lexer.scan_tokens();
     if lexer.get_errors().is_some() {
-      return Err(());
+      return Err(format!(
+        "Lexing errors occured: {:?}",
+        lexer.get_errors().unwrap()
+      ));
     }
     let mut parser = Parser::new(tokens);
     let ast = parser.parse();
     if parser.get_errors().is_some() {
-      return Err(());
+      return Err(format!(
+        "Parsing errors occured: {:?}",
+        parser.get_errors().unwrap()
+      ));
     }
+
+    Ok(stringify(&ast, 0))
+  }
+
+  #[test]
+  fn parse_function() -> Result<(), String> {
+    let got = get_ast("(let foo (func (a b c) {}))")?;
+    let expected = r#"{
+@type : Block
+@children : {
+  @type : Assignement(Let)
+  @children : {
+    @type : NodeIdentifier("foo")
+    @children : {
+      }
+    @type : Block
+    @children : {
+      @type : Func
+      @children : {
+        @type : Block
+        @children : {
+          @type : NodeIdentifier("a")
+          @children : {
+            }
+          @type : NodeIdentifier("b")
+          @children : {
+            }
+          @type : NodeIdentifier("c")
+          @children : {
+            }
+          }
+        @type : Scope
+        @children : {
+          }
+        }
+      }
+    }
+  }
+}"#
+      .to_owned();
+
+    assert_eq!(got.trim(), expected.trim());
+    Ok(())
+  }
+
+  #[test]
+  fn parse_operation() -> Result<(), String> {
+    let got = get_ast("(+ 5 (- 6 (* 5 (/ 8 2))))")?;
+    let expected = r#"{
+@type : Block
+@children : {
+  @type : Operator(Plus)
+  @children : {
+    @type : NodeNumber(5.0)
+    @children : {
+      }
+    @type : Block
+    @children : {
+      @type : Operator(Minus)
+      @children : {
+        @type : NodeNumber(6.0)
+        @children : {
+          }
+        @type : Block
+        @children : {
+          @type : Operator(Times)
+          @children : {
+            @type : NodeNumber(5.0)
+            @children : {
+              }
+            @type : Block
+            @children : {
+              @type : Operator(Div)
+              @children : {
+                @type : NodeNumber(8.0)
+                @children : {
+                  }
+                @type : NodeNumber(2.0)
+                @children : {
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}"#
+      .to_owned();
+
+    assert_eq!(got.trim(), expected.trim());
     Ok(())
   }
   #[test]
-  fn tokenizing() {
-    let to_tokenize = "(let foo (+ 5 ( + 9 4)))(if (> foo 14) (print \"Greater that 14\")(print \"Less that 14\")))";
-    let mut lexer = Lexer::new(to_tokenize);
-    let tokens = lexer.scan_tokens();
+  fn parse_assignement() -> Result<(), String> {
+    let got = get_ast("(let bar 7)(const foo 'bar')")?;
+    let expected = r#"{
+@type : Block
+@children : {
+  @type : Assignement(Let)
+  @children : {
+    @type : NodeIdentifier("bar")
+    @children : {
+      }
+    @type : NodeNumber(7.0)
+    @children : {
+      }
+    }
+  }
+@type : Block
+@children : {
+  @type : Assignement(Const)
+  @children : {
+    @type : NodeIdentifier("foo")
+    @children : {
+      }
+    @type : NodeStr("bar")
+    @children : {
+      }
+    }
+  }
+}"#
+      .to_owned();
 
-    assert_eq!(
-      tokens,
-      vec![
-        Token {
-          typ: LeftParen,
-          lexeme: "(".to_owned(),
-          line: 1
-        },
-        Token {
-          typ: Let,
-          lexeme: "let".to_owned(),
-          line: 1
-        },
-        Token {
-          typ: Identifier("foo".to_owned()),
-          lexeme: "foo".to_owned(),
-          line: 1
-        },
-        Token {
-          typ: LeftParen,
-          lexeme: "(".to_owned(),
-          line: 1
-        },
-        Token {
-          typ: Plus,
-          lexeme: "+".to_owned(),
-          line: 1
-        },
-        Token {
-          typ: Number(5.0),
-          lexeme: "5".to_owned(),
-          line: 1
-        },
-        Token {
-          typ: LeftParen,
-          lexeme: "(".to_owned(),
-          line: 1
-        },
-        Token {
-          typ: Plus,
-          lexeme: "+".to_owned(),
-          line: 1
-        },
-        Token {
-          typ: Number(9.0),
-          lexeme: "9".to_owned(),
-          line: 1
-        },
-        Token {
-          typ: Number(4.0),
-          lexeme: "4".to_owned(),
-          line: 1
-        },
-        Token {
-          typ: RightParen,
-          lexeme: ")".to_owned(),
-          line: 1
-        },
-        Token {
-          typ: RightParen,
-          lexeme: ")".to_owned(),
-          line: 1
-        },
-        Token {
-          typ: RightParen,
-          lexeme: ")".to_owned(),
-          line: 1
-        },
-        Token {
-          typ: LeftParen,
-          lexeme: "(".to_owned(),
-          line: 1
-        },
-        Token {
-          typ: If,
-          lexeme: "if".to_owned(),
-          line: 1
-        },
-        Token {
-          typ: LeftParen,
-          lexeme: "(".to_owned(),
-          line: 1
-        },
-        Token {
-          typ: Greater,
-          lexeme: ">".to_owned(),
-          line: 1
-        },
-        Token {
-          typ: Identifier("foo".to_owned()),
-          lexeme: "foo".to_owned(),
-          line: 1
-        },
-        Token {
-          typ: Number(14.0),
-          lexeme: "14".to_owned(),
-          line: 1
-        },
-        Token {
-          typ: RightParen,
-          lexeme: ")".to_owned(),
-          line: 1
-        },
-        Token {
-          typ: LeftParen,
-          lexeme: "(".to_owned(),
-          line: 1
-        },
-        Token {
-          typ: LeftParen,
-          lexeme: "(".to_owned(),
-          line: 1
-        },
-        Token {
-          typ: Identifier("print".to_owned()),
-          lexeme: "print".to_owned(),
-          line: 1
-        },
-        Token {
-          typ: Str("Greater that 14".to_owned()),
-          lexeme: "\"Greater that 14\"".to_owned(),
-          line: 1
-        },
-        Token {
-          typ: RightParen,
-          lexeme: ")".to_owned(),
-          line: 1
-        },
-        Token {
-          typ: LeftParen,
-          lexeme: "(".to_owned(),
-          line: 1
-        },
-        Token {
-          typ: Identifier("print".to_owned()),
-          lexeme: "print".to_owned(),
-          line: 1
-        },
-        Token {
-          typ: Str("Less that 14".to_owned()),
-          lexeme: "\"Less that 14\"".to_owned(),
-          line: 1
-        },
-        Token {
-          typ: RightParen,
-          lexeme: ")".to_owned(),
-          line: 1
-        },
-        Token {
-          typ: RightParen,
-          lexeme: ")".to_owned(),
-          line: 1
-        },
-        Token {
-          typ: RightParen,
-          lexeme: ")".to_owned(),
-          line: 1
-        },
-        Token {
-          typ: Eof,
-          lexeme: "".to_owned(),
-          line: 1
-        }
-      ]
-    )
+    assert_eq!(got.trim(), expected.trim());
+    Ok(())
   }
 }

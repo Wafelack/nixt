@@ -61,7 +61,7 @@ pub enum OperatorType {
   Or,
 }
 
-fn stringify(node: &Node, indentations: usize) -> String {
+pub fn stringify(node: &Node, indentations: usize) -> String {
   let mut toret = String::new();
   toret.push_str("{\n");
   for children in node.get_child() {
