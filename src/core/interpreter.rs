@@ -6,3 +6,4 @@ pub struct Interpreter {
   scopes: Vec<BTreeMap<String, Value>>,
   errors: Vec<String>,
 }
+
