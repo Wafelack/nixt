@@ -8,7 +8,6 @@ pub struct Parser {
   tokens: Vec<Token>,
   ast: Node,
   current: usize,
-  had_error: bool,
   errors: Vec<String>,
   line: usize,
 }
@@ -18,7 +17,6 @@ impl Parser {
       tokens,
       ast: Node::new(Block),
       current: 0,
-      had_error: false,
       errors: vec![],
       line: 1,
     }
@@ -55,7 +53,6 @@ impl Parser {
         TokenType::Func => self.parse_func(),
         Identifier(s) => self.function_call(s),
         _ => {
-          self.had_error = true;
           self.errors.push(format!(
             "Line {} | Found an invalid token in block parsing: `{}`",
             self.line, current.lexeme,
@@ -93,7 +90,6 @@ impl Parser {
         TokenType::Func => self.parse_func(),
         Identifier(s) => self.function_call(s),
         _ => {
-          self.had_error = true;
           self.errors.push(format!(
             "Line {} | Found an invalid token in block parsing: `{}`",
             self.line, current.lexeme,
@@ -130,7 +126,6 @@ impl Parser {
         True => Node::new(NodeBool(true)),
         False => Node::new(NodeBool(false)),
         _ => {
-          self.had_error = true;
           self.errors.push(format!(
             "Line {} | Found an invalid token in function call: `{}`",
             self.line, current.lexeme,
@@ -157,7 +152,6 @@ impl Parser {
       LeftParen => self.parse_block(false),
       TokenType::Func => self.parse_func(),
       _ => {
-        self.had_error = true;
         self.errors.push(format!(
           "Line {} | Found an invalid token in return: `{}`",
           self.line, to_ret.lexeme,
@@ -176,7 +170,6 @@ impl Parser {
       LeftParen => self.parse_block(false),
       Identifier(s) => Node::new(NodeIdentifier(s.to_string())),
       _ => {
-        self.had_error = true;
         self.errors.push(format!(
           "Line {} | Found an invalid token in loop condition `{}`",
           self.line, first_tok.lexeme,
@@ -189,7 +182,6 @@ impl Parser {
     let body = match &body_tok.typ {
       LeftBrace => self.parse_scope(false),
       _ => {
-        self.had_error = true;
         self.errors.push(format!(
           "Line {} | Found an invalid token in loop body: `{}`",
           self.line, body_tok.lexeme,
@@ -210,7 +202,6 @@ impl Parser {
       LeftParen => self.parse_args(),
       Eof => return Node::new(None),
       _ => {
-        self.had_error = true;
         self.errors.push(format!(
           "Line {} | Found an invalid token in function arguments: `{}`",
           self.line, first_tok.lexeme
@@ -222,7 +213,6 @@ impl Parser {
     let body = match &sec_tok.typ {
       LeftBrace => self.parse_scope(false),
       _ => {
-        self.had_error = true;
         self.errors.push(format!(
           "Line {} | Found an invalid token in function body: `{}`",
           self.line, sec_tok.lexeme
@@ -266,7 +256,6 @@ impl Parser {
       LeftParen => self.parse_block(false),
       Identifier(s) => Node::new(NodeIdentifier(s.to_string())),
       _ => {
-        self.had_error = true;
         self.errors.push(format!(
           "Line {} | Found an invalid token in condition: `{}`",
           self.line, first_tok.lexeme
@@ -279,7 +268,6 @@ impl Parser {
     let todo_if = match &todo_if_tok.typ {
       LeftParen => self.parse_block(false),
       _ => {
-        self.had_error = true;
         self.errors.push(format!(
           "{} | Invalid character {:?}",
           self.line, todo_if_tok
@@ -316,7 +304,6 @@ impl Parser {
       Str(s) => Node::new(NodeStr(s)),
       Identifier(s) => Node::new(NodeIdentifier(s)),
       _ => {
-        self.had_error = true;
         self.errors.push(format!(
           "Line {} | Found invalid token in operation's left expression: `{}`",
           self.line, first_tok.lexeme,
@@ -335,7 +322,6 @@ impl Parser {
       False => Node::new(NodeBool(false)),
       Identifier(s) => Node::new(NodeIdentifier(s)),
       _ => {
-        self.had_error = true;
         self.errors.push(format!(
           "Line {} | Found invalid token in operation's right expression: `{}`",
           self.line, first_tok.lexeme,
@@ -368,7 +354,6 @@ impl Parser {
     let name = match name_tok.typ {
       Identifier(s) => Node::new(NodeIdentifier(s)),
       _ => {
-        self.had_error = true;
         self.errors.push(format!(
           "Line {} | Found invalid token in variable name: `{}`",
           self.line, name_tok.lexeme
@@ -389,7 +374,6 @@ impl Parser {
       Plus | Minus | Star | Slash => self.parse_op(&value_tok.typ),
       LeftParen => self.parse_block(false),
       _ => {
-        self.had_error = true;
         self.errors.push(format!(
           "Line {} | Found invalid token in variable value: `{}`",
           self.line, value_tok.lexeme
@@ -422,7 +406,6 @@ impl Parser {
         blck.add_children(&self.parse_scope(true));
       }
       _ => {
-        self.had_error = true;
         self.errors.push(format!(
           "Line {} | Found an invalid token: `{}`",
           self.line, current.lexeme
@@ -436,10 +419,10 @@ impl Parser {
     }
     self.ast.clone()
   }
-  pub fn had_error(&self) -> bool {
-    self.had_error
-  }
-  pub fn get_errors(&self) -> Vec<String> {
-    self.errors.clone()
+  pub fn get_errors(&self) -> Option<Vec<String>> {
+    if self.errors.is_empty() {
+      return std::option::Option::None;
+    }
+    Some(self.errors.clone())
   }
 }

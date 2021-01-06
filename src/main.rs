@@ -14,22 +14,24 @@ fn main() {
         std::io::stdin().read_line(&mut input).unwrap();
         let mut lexer = Lexer::new(&input.trim());
         let toks = lexer.scan_tokens();
-        if lexer.had_error() {
-            let errs = lexer.get_errors();
-            for error in &errs {
+        let errs_lex = lexer.get_errors();
+        if *(&errs_lex.is_some()) {
+            let err_unwraped = &errs_lex.unwrap();
+            for error in err_unwraped {
                 println!("{}", error);
             }
-            panic!("{} lexing errors occured !", errs.len());
+            panic!("{} lexing errors occured !", err_unwraped.len());
         }
         let mut parser = Parser::new(toks);
         let ast = parser.parse();
         println!("{}", ast);
-        if parser.had_error() {
-            let errs = parser.get_errors();
-            for error in &errs {
+        let errs = parser.get_errors();
+        if errs.is_some() {
+            let err_unwraped = &errs_lex.unwrap();
+            for error in err_unwraped {
                 println!("{}", error);
             }
-            panic!("{} parsing errors occured !", errs.len());
+            panic!("{} parsing errors occured !", err_unwraped.len());
         }
     }
 }

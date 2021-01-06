@@ -8,7 +8,6 @@ pub struct Lexer {
     start: usize,
     current: usize,
     line: usize,
-    had_error: bool,
     errors: Vec<String>,
     keywords: BTreeMap<String, TokenType>,
 }
@@ -34,7 +33,6 @@ impl Lexer {
             start: 0,
             current: 0,
             line: 1,
-            had_error: false,
             errors: vec![],
             keywords: keywords,
         }
@@ -94,7 +92,6 @@ impl Lexer {
                 } else if is_identifier_allowed(c) {
                     self.identifier();
                 } else {
-                    self.had_error = true;
                     self.errors
                         .push(format!("{} | Unexpected character: {}", self.line, c));
                 }
@@ -157,7 +154,6 @@ impl Lexer {
         if self.is_at_end() {
             self.errors
                 .push(format!("{} | Unterminated string", self.line));
-            self.had_error = true;
             return;
         }
         self.advance(); // Consume closing character
@@ -176,11 +172,12 @@ impl Lexer {
         }
         self.source.chars().collect::<Vec<char>>()[self.current + 1]
     }
-    pub fn had_error(&self) -> bool {
-        self.had_error
-    }
-    pub fn get_errors(&self) -> Vec<String> {
-        self.errors.clone()
+
+    pub fn get_errors(&self) -> Option<Vec<String>> {
+        if self.errors.is_empty() {
+            return None;
+        }
+        Some(self.errors.clone())
     }
     fn match_(&mut self, expected: char) -> bool {
         if self.is_at_end() {

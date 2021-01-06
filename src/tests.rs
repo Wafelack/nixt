@@ -12,12 +12,12 @@ mod test {
     let to_parse = "(let foo 5)";
     let mut lexer = Lexer::new(to_parse);
     let tokens = lexer.scan_tokens();
-    if lexer.had_error() {
+    if lexer.get_errors().is_some() {
       return Err(());
     }
     let mut parser = Parser::new(tokens);
     let ast = parser.parse();
-    if parser.had_error() {
+    if parser.get_errors().is_some() {
       return Err(());
     }
     Ok(())
