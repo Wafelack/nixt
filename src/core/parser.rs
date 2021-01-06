@@ -48,7 +48,7 @@ impl Parser {
                 LeftBrace => self.parse_scope(false),
                 LeftParen => self.parse_block(false),
                 Let | Const | Set => self.parse_assignement(&current.typ),
-                Plus | Minus | Star | Slash | Less | LessEqual | And | Or | Tilde | Equal | Greater
+                Plus | Minus | Star | Slash | Less | LessEqual | And | Or | Tilde | Equal | Greater | Percent
                     | GreaterEqual => self.parse_op(&current.typ),
                 TokenType::Func => self.parse_func(),
                 Identifier(s) => self.function_call(s),
@@ -345,6 +345,7 @@ impl Parser {
             Less => Node::new(Operator(OperatorType::Less)),
             LessEqual => Node::new(Operator(OperatorType::LessEqual)),
             Tilde => Node::new(Operator(OperatorType::NotEqual)),
+            Percent => Node::new(Operator(OperatorType::Modulo)),
             _ => Node::new(Operator(OperatorType::Div)),
         };
         master.add_children(&first);

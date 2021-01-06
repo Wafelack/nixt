@@ -47,18 +47,19 @@ pub enum AssignType {
 }
 #[derive(Debug, Clone, PartialEq)]
 pub enum OperatorType {
-  Plus,
-  Minus,
-  Times,
-  Div,
-  Less,
-  LessEqual,
-  Greater,
-  GreaterEqual,
-  Equal,
-  NotEqual,
-  And,
-  Or,
+    Plus,
+    Minus,
+    Times,
+    Div,
+    Less,
+    LessEqual,
+    Greater,
+    GreaterEqual,
+    Equal,
+    NotEqual,
+    And,
+    Or,
+    Modulo
 }
 
 pub fn stringify(node: &Node, indentations: usize) -> String {

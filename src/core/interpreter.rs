@@ -7,3 +7,11 @@ pub struct Interpreter {
   errors: Vec<String>,
 }
 
+impl Interpreter {
+    pub fn new(ast: Node) -> Self {
+        Self { ast: ast, scopes: vec![], errors: vec![]}
+    }
+    pub fn add_scope(&mut self) {
+        self.scopes.push(BTreeMap::new())
+    }
+}
