@@ -17,25 +17,22 @@
 
 Nixt goal is to provide a fast and easy to learn scripting language that provides productivity due to its easy syntax and correct performances
 
-# Installation
 
-N/A
+# Examples
 
-# Build
-
-## Prerequisties
-
-- You'll need `rustc` and `cargo`
-
-## How to
-
-- Clone the repo
-- Run `cargo test --verbose` to check viability of the code
-- Run `cargo build --release`
-
-# Todo
-
-- [x] - Write the parser
-- [ ] - Write the interpreter
-- [ ] - Write the standard library
-- [ ] - Add lists
+FizzBuzz : 
+```lisp
+(let fizzbuzz (func (n) {
+  (let i 1)
+  (while (<= i n ) {
+    (if (= (% i 15) 0) ((print "FizzBuzz") 
+      (if (= (% i 5) 0)  (
+        (print "Buzz")
+        (if (= (% i 3) 0) (
+          (print "Fizz")
+          (print i)
+        )))
+    )))
+  })  
+}))
+```
