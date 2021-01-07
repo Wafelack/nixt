@@ -48,15 +48,15 @@ impl Parser {
                 LeftBrace => self.parse_scope(false),
                 LeftParen => self.parse_block(false),
                 Let | Const | Set => self.parse_assignement(&current.typ),
-                Plus | Minus | Star | Slash | Less | LessEqual | And | Or | Tilde | Equal | Greater | Percent
-                    | GreaterEqual => self.parse_op(&current.typ),
+                Plus | Minus | Star | Slash | Less | LessEqual | And | Or | Tilde | Equal
+                | Greater | Percent | GreaterEqual => self.parse_op(&current.typ),
                 TokenType::Func => self.parse_func(),
                 Identifier(s) => self.function_call(s),
                 _ => {
                     self.errors.push(format!(
-                            "Line {} | Found an invalid token in block parsing: `{}`",
-                            self.line, current.lexeme,
-                            ));
+                        "Line {} | Found an invalid token in block parsing: `{}`",
+                        self.line, current.lexeme,
+                    ));
                     Node::new(None)
                 }
             };
@@ -85,25 +85,23 @@ impl Parser {
                 LeftParen => self.parse_block(false),
                 LeftBrace => self.parse_scope(false),
                 Let | Const | Set => self.parse_assignement(&current.typ),
-                Plus | Minus | Star | Slash | Less | LessEqual | And | Or | Tilde | Equal | Greater
-                    | GreaterEqual => self.parse_op(&current.typ),
+                Plus | Minus | Star | Slash | Less | LessEqual | And | Or | Tilde | Equal
+                | Greater | GreaterEqual => self.parse_op(&current.typ),
                 TokenType::Func => self.parse_func(),
                 Identifier(s) => self.function_call(s),
                 _ => {
                     self.errors.push(format!(
-                            "Line {} | Found an invalid token in block parsing: `{}`",
-                            self.line, current.lexeme,
-                            ));
+                        "Line {} | Found an invalid token in block parsing: `{}`",
+                        self.line, current.lexeme,
+                    ));
                     Node::new(None)
                 }
             };
             toret.add_children(&to_add);
-
         }
         if ast {
             self.ast.add_children(&toret);
         }
-
 
         toret
     }
@@ -130,9 +128,9 @@ impl Parser {
                 False => Node::new(NodeBool(false)),
                 _ => {
                     self.errors.push(format!(
-                            "Line {} | Found an invalid token in function call: `{}`",
-                            self.line, current.lexeme,
-                            ));
+                        "Line {} | Found an invalid token in function call: `{}`",
+                        self.line, current.lexeme,
+                    ));
                     Node::new(None)
                 }
             };
@@ -156,9 +154,9 @@ impl Parser {
             TokenType::Func => self.parse_func(),
             _ => {
                 self.errors.push(format!(
-                        "Line {} | Found an invalid token in return: `{}`",
-                        self.line, to_ret.lexeme,
-                        ));
+                    "Line {} | Found an invalid token in return: `{}`",
+                    self.line, to_ret.lexeme,
+                ));
                 Node::new(None)
             }
         };
@@ -174,9 +172,9 @@ impl Parser {
             Identifier(s) => Node::new(NodeIdentifier(s.to_string())),
             _ => {
                 self.errors.push(format!(
-                        "Line {} | Found an invalid token in loop condition `{}`",
-                        self.line, first_tok.lexeme,
-                        ));
+                    "Line {} | Found an invalid token in loop condition `{}`",
+                    self.line, first_tok.lexeme,
+                ));
                 Node::new(None)
             }
         };
@@ -186,9 +184,9 @@ impl Parser {
             LeftBrace => self.parse_scope(false),
             _ => {
                 self.errors.push(format!(
-                        "Line {} | Found an invalid token in loop body: `{}`",
-                        self.line, body_tok.lexeme,
-                        ));
+                    "Line {} | Found an invalid token in loop body: `{}`",
+                    self.line, body_tok.lexeme,
+                ));
                 Node::new(None)
             }
         };
@@ -206,9 +204,9 @@ impl Parser {
             Eof => return Node::new(None),
             _ => {
                 self.errors.push(format!(
-                        "Line {} | Found an invalid token in function arguments: `{}`",
-                        self.line, first_tok.lexeme
-                        ));
+                    "Line {} | Found an invalid token in function arguments: `{}`",
+                    self.line, first_tok.lexeme
+                ));
                 Node::new(None)
             }
         };
@@ -217,9 +215,9 @@ impl Parser {
             LeftBrace => self.parse_scope(false),
             _ => {
                 self.errors.push(format!(
-                        "Line {} | Found an invalid token in function body: `{}`",
-                        self.line, sec_tok.lexeme
-                        ));
+                    "Line {} | Found an invalid token in function body: `{}`",
+                    self.line, sec_tok.lexeme
+                ));
                 Node::new(Block)
             }
         };
@@ -260,9 +258,9 @@ impl Parser {
             Identifier(s) => Node::new(NodeIdentifier(s.to_string())),
             _ => {
                 self.errors.push(format!(
-                        "Line {} | Found an invalid token in condition: `{}`",
-                        self.line, first_tok.lexeme
-                        ));
+                    "Line {} | Found an invalid token in condition: `{}`",
+                    self.line, first_tok.lexeme
+                ));
                 Node::new(None)
             }
         };
@@ -272,17 +270,17 @@ impl Parser {
             LeftParen => self.parse_block(false),
             _ => {
                 self.errors.push(format!(
-                        "{} | Invalid character {:?}",
-                        self.line, todo_if_tok
-                        ));
+                    "{} | Invalid character {:?}",
+                    self.line, todo_if_tok
+                ));
                 Node::new(None)
             }
         };
-        let todo_else_tok = self.advance();
-
-        let todo_else = match &todo_else_tok.typ {
-            LeftParen => self.parse_block(false),
-            _ => Node::new(None), // Valid because Else block is not required
+        let todo_else = if self.peek().is_some() && self.peek().unwrap().typ == LeftParen {
+            self.advance();
+            self.parse_block(false)
+        } else {
+            Node::new(NodeType::None)
         };
 
         master.add_children(&check);
@@ -308,9 +306,9 @@ impl Parser {
             Identifier(s) => Node::new(NodeIdentifier(s)),
             _ => {
                 self.errors.push(format!(
-                        "Line {} | Found invalid token in operation's left expression: `{}`",
-                        self.line, first_tok.lexeme,
-                        ));
+                    "Line {} | Found invalid token in operation's left expression: `{}`",
+                    self.line, first_tok.lexeme,
+                ));
                 Node::new(None)
             }
         };
@@ -326,9 +324,9 @@ impl Parser {
             Identifier(s) => Node::new(NodeIdentifier(s)),
             _ => {
                 self.errors.push(format!(
-                        "Line {} | Found invalid token in operation's right expression: `{}`",
-                        self.line, first_tok.lexeme,
-                        ));
+                    "Line {} | Found invalid token in operation's right expression: `{}`",
+                    self.line, first_tok.lexeme,
+                ));
                 Node::new(None)
             }
         };
@@ -359,9 +357,9 @@ impl Parser {
             Identifier(s) => Node::new(NodeIdentifier(s)),
             _ => {
                 self.errors.push(format!(
-                        "Line {} | Found invalid token in variable name: `{}`",
-                        self.line, name_tok.lexeme
-                        ));
+                    "Line {} | Found invalid token in variable name: `{}`",
+                    self.line, name_tok.lexeme
+                ));
                 return Node::new(None);
             }
         };
@@ -379,9 +377,9 @@ impl Parser {
             LeftParen => self.parse_block(false),
             _ => {
                 self.errors.push(format!(
-                        "Line {} | Found invalid token in variable value: `{}`",
-                        self.line, value_tok.lexeme
-                        ));
+                    "Line {} | Found invalid token in variable value: `{}`",
+                    self.line, value_tok.lexeme
+                ));
                 return Node::new(None);
             }
         };
@@ -411,9 +409,9 @@ impl Parser {
             }
             _ => {
                 self.errors.push(format!(
-                        "Line {} | Found an invalid token: `{}`",
-                        self.line, current.lexeme
-                        ));
+                    "Line {} | Found an invalid token: `{}`",
+                    self.line, current.lexeme
+                ));
             }
         }
     }

@@ -27,7 +27,7 @@ fn main() {
         println!("{}", ast);
         let errs = parser.get_errors();
         if errs.is_some() {
-            let err_unwraped = &errs_lex.unwrap();
+            let err_unwraped = &errs.unwrap();
             for error in err_unwraped {
                 println!("{}", error);
             }
