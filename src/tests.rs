@@ -196,7 +196,7 @@ mod test {
   @type : Block
   @children : {
     @type : Loop
-    @children : {
+    @children : {   
       @type : Block
       @children : {
         @type : Operator(Less)

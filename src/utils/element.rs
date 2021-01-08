@@ -1,5 +1,5 @@
 pub use crate::utils::node::Node;
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum Value {
   String(String),
   Number(f32),
@@ -8,7 +8,7 @@ pub enum Value {
   Func(Func),
   Nil,
 }
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Func {
   pub args: Vec<String>,
   pub body: Node,

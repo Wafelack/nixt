@@ -65,8 +65,22 @@ impl Interpreter {
             NodeType::NodeStr(s) => return Value::String(s),
             NodeType::NodeBool(b) => return Value::Bool(b),
             NodeType::Block => return self.process_inner_block(&val),
+            NodeType::NodeIdentifier(s) => {
+                return self
+                    .get_value(s)
+                    .unwrap_or_else(|| panic!("ERROR: Attempted to access an undefined variable"))
+            }
             _ => return Value::Nil,
         }
+    }
+    fn get_value(&mut self, value: String) -> Option<Value> {
+        for i in (0..self.scopes.len()).rev() {
+            let scope = &self.scopes[i];
+            if scope.contains_key(&value) {
+                return Some((scope[&value].0).clone());
+            }
+        }
+        None
     }
     fn process_inner_block(&mut self, val: &Node) -> Value {
         if val.get_child().len() < 1 {
