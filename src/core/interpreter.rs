@@ -139,6 +139,14 @@ impl Interpreter {
       NodeType::NodeNumber(n) => Value::Number(n),
       NodeType::NodeStr(s) => Value::String(s),
       NodeType::NodeBool(b) => Value::Bool(b),
+      NodeType::None => Value::Nil,
+      NodeType::NodeIdentifier(s) => {
+        if self.get_value(&s).is_some() {
+          self.get_value(&s).unwrap()
+        } else {
+          return Err("Attempted to access an undefined variable".to_owned());
+        }
+      }
       _ => return Err("Invalid element".to_owned()),
     };
 
@@ -147,6 +155,14 @@ impl Interpreter {
       NodeType::NodeNumber(n) => Value::Number(n),
       NodeType::NodeStr(s) => Value::String(s),
       NodeType::NodeBool(b) => Value::Bool(b),
+      NodeType::None => Value::Nil,
+      NodeType::NodeIdentifier(s) => {
+        if self.get_value(&s).is_some() {
+          self.get_value(&s).unwrap()
+        } else {
+          return Err("Attempted to access an undefined variable".to_owned());
+        }
+      }
       _ => return Err("Invalid element".to_owned()),
     };
 
@@ -156,7 +172,30 @@ impl Interpreter {
       OperatorType::Plus => Ok(self.add(lhs, rhs)?),
       OperatorType::Minus => Ok(self.sub(lhs, rhs)?),
       OperatorType::Modulo => Ok(self.modulo(lhs, rhs)?),
+      OperatorType::Equal => Ok(self.eq(lhs, rhs)?),
       _ => Err("Invalid operator".to_owned()),
+    }
+  }
+
+  fn eq(&self, lhs: Value, rhs: Value) -> Result<Value, String> {
+    match lhs {
+      Value::Number(lh) => match rhs {
+        Value::Number(rh) => Ok(Value::Bool(rh == lh)),
+        _ => Ok(Value::Bool(false)),
+      },
+      Value::Bool(lh) => match rhs {
+        Value::Bool(rh) => Ok(Value::Bool(rh == lh)),
+        _ => Ok(Value::Bool(false)),
+      },
+      Value::String(lh) => match rhs {
+        Value::String(rh) => Ok(Value::Bool(rh == lh)),
+        _ => Ok(Value::Bool(false)),
+      },
+      Value::Nil => match rhs {
+        Value::Nil => Ok(Value::Bool(true)),
+        _ => Ok(Value::Bool(false)),
+      },
+      _ => Ok(Value::Bool(false)),
     }
   }
 

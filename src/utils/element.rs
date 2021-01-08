@@ -30,7 +30,7 @@ impl std::fmt::Display for Value {
 
 impl std::fmt::Display for Func {
   fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-    write!(f, "@args: {:?}\n@body: {}", self.args, self.body);
+    write!(f, "@args: {:?}\n@body: {}", self.args, self.body)?;
     Ok(())
   }
 }
