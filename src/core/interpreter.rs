@@ -174,6 +174,10 @@ impl Interpreter {
       OperatorType::Modulo => Ok(self.modulo(lhs, rhs)?),
       OperatorType::Equal => Ok(self.eq(lhs, rhs)?),
       OperatorType::NotEqual => Ok(self.neq(lhs, rhs)?),
+      OperatorType::LessEqual => Ok(self.leq(lhs, rhs)?),
+      OperatorType::Less => Ok(self.le(lhs, rhs)?),
+      OperatorType::Greater => Ok(self.ge(lhs, rhs)?),
+      OperatorType::GreaterEqual => Ok(self.ge(lhs, rhs)?),
       _ => Err("Invalid operator".to_owned()),
     }
   }
@@ -219,6 +223,45 @@ impl Interpreter {
         _ => Ok(Value::Bool(true)),
       },
       _ => Ok(Value::Bool(true)),
+    }
+  }
+
+  fn leq(&self, lhs: Value, rhs: Value) -> Result<Value, String> {
+    match lhs {
+      Value::Number(lh) => match rhs {
+        Value::Number(rh) => Ok(Value::Bool(rh <= lh)),
+        _ => Ok(Value::Nil),
+      },
+      _ => Ok(Value::Nil),
+    }
+  }
+  fn le(&self, lhs: Value, rhs: Value) -> Result<Value, String> {
+    match lhs {
+      Value::Number(lh) => match rhs {
+        Value::Number(rh) => Ok(Value::Bool(rh < lh)),
+        _ => Ok(Value::Nil),
+      },
+      _ => Ok(Value::Nil),
+    }
+  }
+
+  fn geq(&self, lhs: Value, rhs: Value) -> Result<Value, String> {
+    match lhs {
+      Value::Number(lh) => match rhs {
+        Value::Number(rh) => Ok(Value::Bool(rh >= lh)),
+        _ => Ok(Value::Nil),
+      },
+      _ => Ok(Value::Nil),
+    }
+  }
+
+  fn ge(&self, lhs: Value, rhs: Value) -> Result<Value, String> {
+    match lhs {
+      Value::Number(lh) => match rhs {
+        Value::Number(rh) => Ok(Value::Bool(rh > lh)),
+        _ => Ok(Value::Nil),
+      },
+      _ => Ok(Value::Nil),
     }
   }
 
