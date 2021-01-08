@@ -21,6 +21,34 @@ impl Interpreter {
     fn remove_scope(&mut self) {
         self.scopes.pop();
     }
+    fn var_edit(&mut self, name: &Node, new_val: &Node) -> Result<(), String> {
+        if self.scopes.len() == 0 {
+            return Err("No scopes available. Consider adding a scope to your program".to_owned());
+        }
+        let scope = &self.scopes[self.scopes.len() - 1];
+        let name = if let NodeType::NodeIdentifier(s) = name.get_type() {
+            s
+        } else {
+            return Err("Found an invalid identifier in variable edition".to_owned());
+            // Should never be called because parser checks
+        };
+
+        if !is_defined(&scope, &name) {
+            return Err("Attempted to redefine an undefined variable".to_owned());
+        }
+
+        if scope[&name].1 {
+            return Err("Attempted to redefine a constant".to_owned());
+        }
+
+        let new_val_valued = self.proc_value(new_val)?;
+
+        if let Some(x) = self.scopes.last_mut().unwrap().get_mut(&name) {
+            *x = (new_val_valued, false)
+        }
+
+        Ok(())
+    }
     fn var_def(&mut self, is_const: bool, name: &Node, value: &Node) -> Result<(), String> {
         if self.scopes.len() == 0 {
             return Err("No scopes available. Consider adding a scope to your program".to_owned());
@@ -46,7 +74,7 @@ impl Interpreter {
             .insert(name, (value, is_const));
         Ok(())
     }
-    fn proc_fun_def(&mut self, val: &Node) -> Result<Value, String> {
+    fn proc_fun_def(&self, val: &Node) -> Result<Value, String> {
         let mut argstr = Vec::<String>::new();
 
         let args = val.get_child()[0].get_child();
@@ -65,7 +93,7 @@ impl Interpreter {
             body: val.get_child()[1].clone(),
         }))
     }
-    fn proc_value(&mut self, val: &Node) -> Result<Value, String> {
+    fn proc_value(&self, val: &Node) -> Result<Value, String> {
         match val.get_type() {
             NodeType::NodeNumber(n) => return Ok(Value::Number(n)),
             NodeType::NodeStr(s) => return Ok(Value::String(s)),
@@ -81,7 +109,7 @@ impl Interpreter {
             _ => return Ok(Value::Nil),
         }
     }
-    fn get_value(&mut self, value: &String) -> Option<Value> {
+    fn get_value(&self, value: &String) -> Option<Value> {
         for i in (0..self.scopes.len()).rev() {
             let scope = &self.scopes[i];
             if scope.contains_key(value) {
@@ -90,7 +118,7 @@ impl Interpreter {
         }
         None
     }
-    fn process_inner_block(&mut self, val: &Node) -> Result<Value, String> {
+    fn process_inner_block(&self, val: &Node) -> Result<Value, String> {
         if val.get_child().len() < 1 {
             return Ok(Value::Nil);
         }
@@ -128,7 +156,7 @@ impl Interpreter {
 
                 if let NodeType::Assignement(a) = t {
                     if a == AssignType::Set {
-                        todo!()
+                        self.var_edit(&children[0], &children[1])?;
                     } else {
                         self.var_def(
                             if a == AssignType::Const { true } else { false },
