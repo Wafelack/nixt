@@ -26,7 +26,6 @@ fn main() -> Result<(), String> {
         let mut parser = Parser::new(toks);
         let ast = parser.parse();
         let errs = parser.get_errors();
-        println!("{}", &ast);
         if errs.is_some() {
             let err_unwraped = &errs.unwrap();
             for error in err_unwraped {

@@ -137,12 +137,16 @@ impl Interpreter {
     let lhs = match operator_character.get_child()[0].get_type() {
       NodeType::Block => self.process_inner_block(&operator_character.get_child()[0])?,
       NodeType::NodeNumber(n) => Value::Number(n),
+      NodeType::NodeStr(s) => Value::String(s),
+      NodeType::NodeBool(b) => Value::Bool(b),
       _ => return Err("Invalid element".to_owned()),
     };
 
     let rhs = match operator_character.get_child()[1].get_type() {
       NodeType::Block => self.process_inner_block(&operator_character.get_child()[1])?,
       NodeType::NodeNumber(n) => Value::Number(n),
+      NodeType::NodeStr(s) => Value::String(s),
+      NodeType::NodeBool(b) => Value::Bool(b),
       _ => return Err("Invalid element".to_owned()),
     };
 
