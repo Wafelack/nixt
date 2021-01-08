@@ -168,18 +168,40 @@ impl Interpreter {
     };
 
     match op {
-      OperatorType::Div => Ok(self.div(lhs, rhs)?),
-      OperatorType::Times => Ok(self.mul(lhs, rhs)?),
-      OperatorType::Plus => Ok(self.add(lhs, rhs)?),
-      OperatorType::Minus => Ok(self.sub(lhs, rhs)?),
-      OperatorType::Modulo => Ok(self.modulo(lhs, rhs)?),
-      OperatorType::Equal => Ok(self.eq(lhs, rhs)?),
-      OperatorType::NotEqual => Ok(self.neq(lhs, rhs)?),
-      OperatorType::LessEqual => Ok(self.leq(lhs, rhs)?),
-      OperatorType::Less => Ok(self.le(lhs, rhs)?),
-      OperatorType::Greater => Ok(self.ge(lhs, rhs)?),
-      OperatorType::GreaterEqual => Ok(self.ge(lhs, rhs)?),
+      OperatorType::Div => self.div(lhs, rhs),
+      OperatorType::Times => self.mul(lhs, rhs),
+      OperatorType::Plus => self.add(lhs, rhs),
+      OperatorType::Minus => self.sub(lhs, rhs),
+      OperatorType::Modulo => self.modulo(lhs, rhs),
+      OperatorType::Equal => self.eq(lhs, rhs),
+      OperatorType::NotEqual => self.neq(lhs, rhs),
+      OperatorType::LessEqual => self.leq(lhs, rhs),
+      OperatorType::Less => self.le(lhs, rhs),
+      OperatorType::Greater => self.ge(lhs, rhs),
+      OperatorType::GreaterEqual => self.ge(lhs, rhs),
+      OperatorType::And => self.and(lhs, rhs),
+      OperatorType::Or => self.or(lhs, rhs),
       _ => Err("Invalid operator".to_owned()),
+    }
+  }
+
+  fn and(&self, lhs: Value, rhs: Value) -> Result<Value, String> {
+    match lhs {
+      Value::Bool(lh) => match rhs {
+        Value::Bool(rh) => Ok(Value::Bool(lh && rh)),
+        _ => Ok(Value::Nil),
+      },
+      _ => Ok(Value::Nil),
+    }
+  }
+
+  fn or(&self, lhs: Value, rhs: Value) -> Result<Value, String> {
+    match lhs {
+      Value::Bool(lh) => match rhs {
+        Value::Bool(rh) => Ok(Value::Bool(lh || rh)),
+        _ => Ok(Value::Nil),
+      },
+      _ => Ok(Value::Nil),
     }
   }
 
