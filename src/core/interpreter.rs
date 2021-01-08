@@ -132,57 +132,72 @@ impl Interpreter {
     }
   }
   fn proc_operator(&self, op: OperatorType, val: &Node) -> Result<Value, String> {
+    let operator_character = &val.get_child()[0];
+
+    let lhs = match operator_character.get_child()[0].get_type() {
+      NodeType::Block => self.process_inner_block(&operator_character.get_child()[0])?,
+      NodeType::NodeNumber(n) => Value::Number(n),
+      _ => return Err("Invalid element".to_owned()),
+    };
+
+    let rhs = match operator_character.get_child()[1].get_type() {
+      NodeType::Block => self.process_inner_block(&operator_character.get_child()[1])?,
+      NodeType::NodeNumber(n) => Value::Number(n),
+      _ => return Err("Invalid element".to_owned()),
+    };
+
     match op {
-      OperatorType::Div => Ok(self.div(&val.get_child()[0], &val.get_child()[1])?),
-      OperatorType::Times => Ok(self.mul(&val.get_child()[0], &val.get_child()[1])?),
-      OperatorType::Plus => Ok(self.add(&val.get_child()[0], &val.get_child()[1])?),
-      OperatorType::Minus => Ok(self.sub(&val.get_child()[0], &val.get_child()[1])?),
-      OperatorType::Modulo => Ok(self.mod(&val.get_child()[0], &val.get_child()[1])?),
+      OperatorType::Div => Ok(self.div(lhs, rhs)?),
+      OperatorType::Times => Ok(self.mul(lhs, rhs)?),
+      OperatorType::Plus => Ok(self.add(lhs, rhs)?),
+      OperatorType::Minus => Ok(self.sub(lhs, rhs)?),
+      OperatorType::Modulo => Ok(self.modulo(lhs, rhs)?),
+      _ => Err("Invalid operator".to_owned()),
     }
   }
 
-  fn div(&self, lhs: &Node, rhs: &Node) -> Result<Value, String> {
-    match lhs.get_type() {
-      NodeType::NodeNumber(lh) => match rhs.get_type() {
-        NodeType::NodeNumber(rh) => Ok(Value::Number(lh/rh)),
+  fn div(&self, lhs: Value, rhs: Value) -> Result<Value, String> {
+    match lhs {
+      Value::Number(lh) => match rhs {
+        Value::Number(rh) => Ok(Value::Number(lh / rh)),
         _ => Ok(Value::Nil),
-      }
+      },
       _ => Ok(Value::Nil),
     }
   }
-  fn mul(&self, lhs: &Node, rhs: &Node) -> Result<Value, String> {
-    match lhs.get_type() {
-      NodeType::NodeNumber(lh) => match rhs.get_type() {
-        NodeType::NodeNumber(rh) => Ok(Value::Number(lh*rh)),
+  fn mul(&self, lhs: Value, rhs: Value) -> Result<Value, String> {
+    match lhs {
+      Value::Number(lh) => match rhs {
+        Value::Number(rh) => Ok(Value::Number(lh * rh)),
         _ => Ok(Value::Nil),
-      }
+      },
       _ => Ok(Value::Nil),
     }
   }
-  fn sub(&self, lhs: &Node, rhs: &Node) -> Result<Value, String> {
-    match lhs.get_type() {
-      NodeType::NodeNumber(lh) => match rhs.get_type() {
-        NodeType::NodeNumber(rh) => Ok(Value::Number(lh-rh)),
+  fn sub(&self, lhs: Value, rhs: Value) -> Result<Value, String> {
+    match lhs {
+      Value::Number(lh) => match rhs {
+        Value::Number(rh) => Ok(Value::Number(lh - rh)),
         _ => Ok(Value::Nil),
-      }
+      },
       _ => Ok(Value::Nil),
     }
   }
-  fn add(&self, lhs: &Node, rhs: &Node) -> Result<Value, String> {
-    match lhs.get_type() {
-      NodeType::NodeNumber(lh) => match rhs.get_type() {
-        NodeType::NodeNumber(rh) => Ok(Value::Number(lh+rh)),
+  fn add(&self, lhs: Value, rhs: Value) -> Result<Value, String> {
+    match lhs {
+      Value::Number(lh) => match rhs {
+        Value::Number(rh) => Ok(Value::Number(lh + rh)),
         _ => Ok(Value::Nil),
-      }
+      },
       _ => Ok(Value::Nil),
     }
   }
-  fn mod(&self, lhs: &Node, rhs: &Node) -> Result<Value, String> {
-    match lhs.get_type() {
-      NodeType::NodeNumber(lh) => match rhs.get_type() {
-        NodeType::NodeNumber(rh) => Ok(Value::Number(lh%rh)),
+  fn modulo(&self, lhs: Value, rhs: Value) -> Result<Value, String> {
+    match lhs {
+      Value::Number(lh) => match rhs {
+        Value::Number(rh) => Ok(Value::Number(lh % rh)),
         _ => Ok(Value::Nil),
-      }
+      },
       _ => Ok(Value::Nil),
     }
   }
