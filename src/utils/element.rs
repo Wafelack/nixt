@@ -17,7 +17,7 @@ pub struct Func {
 impl std::fmt::Display for Value {
   fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
     match self {
-      Self::String(s) => write!(f, "'{}'", s)?,
+      Self::String(s) => write!(f, "{}", s)?,
       Self::Number(n) => write!(f, "{}", n)?,
       Self::List(l) => write!(f, "{:?}", l)?,
       Self::Bool(b) => write!(f, "{}", b)?,

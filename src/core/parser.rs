@@ -112,20 +112,18 @@ impl Parser {
 
         loop {
             if self.is_at_end() || self.peek().unwrap().typ == RightParen {
-                if self.peek().is_some() && self.peek().unwrap().typ == RightParen {
-                    self.advance(); // Consume closing char
-                }
                 break;
             }
             let current = self.advance();
 
             let to_add = match &current.typ {
-                Identifier(s) => self.function_call(s.to_owned()),
+                Identifier(s) => Node::new(NodeIdentifier(s.to_owned())),
                 Str(s) => Node::new(NodeStr(s.to_owned())),
                 Number(f) => Node::new(NodeNumber(*f)),
                 LeftParen => self.parse_block(false),
                 True => Node::new(NodeBool(true)),
                 False => Node::new(NodeBool(false)),
+                Nil => Node::new(None),
                 _ => {
                     self.errors.push(format!(
                         "Line {} | Found an invalid token in function call: `{}`",

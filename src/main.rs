@@ -1,4 +1,5 @@
 mod core;
+mod nixt_std;
 mod tests;
 mod utils;
 

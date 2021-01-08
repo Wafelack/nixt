@@ -1,3 +1,4 @@
+use crate::nixt_std;
 use crate::utils::element::*;
 use crate::utils::node::*;
 use std::collections::BTreeMap;
@@ -339,6 +340,29 @@ impl Interpreter {
               &children[0],
               &children[1],
             )?;
+          }
+        } else if let NodeType::FunctionCall(func) = t {
+          let mut as_value = vec![];
+          for child in children {
+            let topsh = match child.get_type() {
+              NodeType::Block => self.process_inner_block(&child)?,
+              NodeType::NodeBool(b) => Value::Bool(b),
+              NodeType::NodeNumber(n) => Value::Number(n),
+              NodeType::NodeStr(s) => Value::String(s),
+              NodeType::None => Value::Nil,
+              NodeType::NodeIdentifier(s) => {
+                if self.get_value(&s).is_some() {
+                  self.get_value(&s).unwrap()
+                } else {
+                  return Err("Attempted to use an undefined function: `{}`, s".to_owned());
+                }
+              }
+              _ => return Err("Unexpected value".to_owned()),
+            };
+            as_value.push(topsh);
+          }
+          if &func == "print" {
+            nixt_std::io::print(&as_value);
           }
         }
       }
