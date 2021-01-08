@@ -57,15 +57,24 @@ impl Interpreter {
         })
     }
     fn proc_value(&mut self, val: &Node) -> Value {
-        if val.get_type() == NodeType::Func {
-            return self.proc_fun_def(val);
-        } else {
-            match val.get_type() {
-                NodeType::NodeNumber(n) => return Value::Number(n),
-                NodeType::NodeStr(s) => return Value::String(s),
-                NodeType::NodeBool(b) => return Value::Bool(b),
-                _ => return Value::Nil,
-            }
+        match val.get_type() {
+            NodeType::NodeNumber(n) => return Value::Number(n),
+            NodeType::NodeStr(s) => return Value::String(s),
+            NodeType::NodeBool(b) => return Value::Bool(b),
+            NodeType::Block => return self.process_inner_block(&val),
+            _ => return Value::Nil,
+        }
+    }
+    fn process_inner_block(&mut self, val: &Node) -> Value {
+        if val.get_child().len() < 1 {
+            return Value::Nil;
+        }
+
+        match val.get_child()[0].get_type() {
+            NodeType::Func => self.proc_fun_def(&val.get_child()[0]),
+            NodeType::Operator(op) => todo!(),
+            NodeType::Block => self.process_inner_block(val),
+            _ => Value::Nil,
         }
     }
     fn process_node(&mut self, node: &Node) {
@@ -73,11 +82,8 @@ impl Interpreter {
             if instruction.get_type() == NodeType::Scope {
                 self.add_scope();
                 self.process_node(&instruction);
-                println!(
-                    "Current scope: {} -> {:?}",
-                    self.scopes.len() - 1,
-                    self.scopes
-                );
+                print!("{} -> ", self.scopes.len() - 1,);
+                display_scope(&self.scopes[self.scopes.len() - 1]);
                 self.remove_scope();
             } else if instruction.get_type() == NodeType::Block {
                 self.process_node(&instruction);
@@ -100,4 +106,12 @@ impl Interpreter {
         };
         interpreter.process_node(&ast);
     }
+}
+
+fn display_scope(scope: &BTreeMap<String, Value>) {
+    println!("{{");
+    for (key, value) in scope {
+        println!("{}: {}", key, value);
+    }
+    println!("}}");
 }
