@@ -2,7 +2,7 @@ use crate::utils::element::*;
 use crate::utils::node::*;
 use std::collections::BTreeMap;
 
-fn is_defined(scope: &BTreeMap<String, Value>, name: &String) -> bool {
+fn is_defined(scope: &BTreeMap<String, (Value, bool)>, name: &String) -> bool {
     if scope.contains_key(name) {
         return true;
     }
@@ -11,7 +11,7 @@ fn is_defined(scope: &BTreeMap<String, Value>, name: &String) -> bool {
 
 pub struct Interpreter {
     ast: Node,
-    scopes: Vec<BTreeMap<String, Value>>,
+    scopes: Vec<BTreeMap<String, (Value, bool)>>,
 }
 
 impl Interpreter {
@@ -21,7 +21,7 @@ impl Interpreter {
     fn remove_scope(&mut self) {
         self.scopes.pop();
     }
-    fn var_def(&mut self, name: &Node, value: &Node) {
+    fn var_def(&mut self, is_const: bool, name: &Node, value: &Node) {
         if self.scopes.len() == 0 {
             panic!("ERROR: No scopes available. Consider adding a scope to your program");
         }
@@ -36,7 +36,10 @@ impl Interpreter {
             panic!("ERROR: Attempted to redefine variable `{}` that is already present in the current scope", &name);
         }
         let value = self.proc_value(value);
-        self.scopes.last_mut().unwrap().insert(name, value);
+        self.scopes
+            .last_mut()
+            .unwrap()
+            .insert(name, (value, is_const));
     }
     fn proc_fun_def(&mut self, val: &Node) -> Value {
         let mut argstr = Vec::<String>::new();
@@ -86,14 +89,26 @@ impl Interpreter {
                 display_scope(&self.scopes[self.scopes.len() - 1]);
                 self.remove_scope();
             } else if instruction.get_type() == NodeType::Block {
+                if self.scopes.len() == 0 {
+                    panic!("ERROR: No scopes available. Consider adding a scope to your program");
+                }
                 self.process_node(&instruction);
             } else {
+                if self.scopes.len() == 0 {
+                    panic!("ERROR: No scopes available. Consider adding a scope to your program");
+                }
                 let t = instruction.get_type();
                 let children = instruction.get_child();
 
                 if let NodeType::Assignement(a) = t {
-                    if a == AssignType::Let {
-                        self.var_def(&children[0], &children[1]);
+                    if a == AssignType::Set {
+                        todo!()
+                    } else {
+                        self.var_def(
+                            if a == AssignType::Const { true } else { false },
+                            &children[0],
+                            &children[1],
+                        );
                     }
                 }
             }
@@ -108,10 +123,15 @@ impl Interpreter {
     }
 }
 
-fn display_scope(scope: &BTreeMap<String, Value>) {
+fn display_scope(scope: &BTreeMap<String, (Value, bool)>) {
     println!("{{");
-    for (key, value) in scope {
-        println!("{}: {}", key, value);
+    for (key, (value, is_const)) in scope {
+        println!(
+            "{}: {} ({})",
+            key,
+            value,
+            if *is_const { "const" } else { "mutable" }
+        );
     }
     println!("}}");
 }
