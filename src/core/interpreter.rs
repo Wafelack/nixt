@@ -173,6 +173,7 @@ impl Interpreter {
       OperatorType::Minus => Ok(self.sub(lhs, rhs)?),
       OperatorType::Modulo => Ok(self.modulo(lhs, rhs)?),
       OperatorType::Equal => Ok(self.eq(lhs, rhs)?),
+      OperatorType::NotEqual => Ok(self.neq(lhs, rhs)?),
       _ => Err("Invalid operator".to_owned()),
     }
   }
@@ -196,6 +197,28 @@ impl Interpreter {
         _ => Ok(Value::Bool(false)),
       },
       _ => Ok(Value::Bool(false)),
+    }
+  }
+
+  fn neq(&self, lhs: Value, rhs: Value) -> Result<Value, String> {
+    match lhs {
+      Value::Number(lh) => match rhs {
+        Value::Number(rh) => Ok(Value::Bool(rh != lh)),
+        _ => Ok(Value::Bool(true)),
+      },
+      Value::Bool(lh) => match rhs {
+        Value::Bool(rh) => Ok(Value::Bool(rh != lh)),
+        _ => Ok(Value::Bool(true)),
+      },
+      Value::String(lh) => match rhs {
+        Value::String(rh) => Ok(Value::Bool(rh != lh)),
+        _ => Ok(Value::Bool(true)),
+      },
+      Value::Nil => match rhs {
+        Value::Nil => Ok(Value::Bool(false)),
+        _ => Ok(Value::Bool(true)),
+      },
+      _ => Ok(Value::Bool(true)),
     }
   }
 
