@@ -425,6 +425,10 @@ impl Interpreter {
           }
           if &func == "print" {
             stdlib::io::print(&as_value);
+          } else if &func == "puts" {
+            stdlib::io::puts(&as_value);
+          } else {
+            self.process_func_call(&instruction, &as_value)?;
           }
         } else if let NodeType::Loop = t {
           self.process_loop(&instruction)?;
@@ -433,6 +437,47 @@ impl Interpreter {
         }
       }
     }
+    Ok(())
+  }
+  fn process_func_call(&mut self, function: &Node, args: &Vec<Value>) -> Result<(), String> {
+    let (func_args, body) = if let NodeType::FunctionCall(s) = function.get_type() {
+      if self.get_value(&s).is_some() {
+        let raw_func = self.get_value(&s).unwrap();
+
+        if let Value::Func(fnc) = raw_func {
+          let args = fnc.args;
+          let body = fnc.body;
+
+          (args, body)
+        } else {
+          return Err("Attempted to call a regular variable as a function".to_owned());
+        }
+      } else {
+        return Err("Attempted to call an undefined function".to_owned());
+      }
+    } else {
+      return Err(
+        "This should not be called, if you see this, please open an issue. Error code: 0x1C2"
+          .to_owned(),
+      );
+    };
+    if args.len() != func_args.len() {
+      return Err(format!(
+        "Invalid number of arguments: expected {} got {}",
+        func_args.len(),
+        args.len()
+      ));
+    }
+    self.add_scope();
+    for i in 0..args.len() {
+      self
+        .scopes
+        .last_mut()
+        .unwrap()
+        .insert(func_args[i].clone(), (args[i].clone(), false));
+    }
+    self.process_node(&body)?;
+    self.remove_scope();
     Ok(())
   }
   pub fn run(ast: Node) -> Result<(), String> {
