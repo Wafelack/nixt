@@ -165,28 +165,27 @@ impl Interpreter {
       _ => return Err("Invalid element".to_owned()),
     };
 
-    match op {
-      OperatorType::Div => self.div(lhs, rhs),
-      OperatorType::Times => self.mul(lhs, rhs),
-      OperatorType::Plus => self.add(lhs, rhs),
-      OperatorType::Minus => self.sub(lhs, rhs),
-      OperatorType::Modulo => self.modulo(lhs, rhs),
-      OperatorType::Equal => self.eq(lhs, rhs),
-      OperatorType::NotEqual => self.neq(lhs, rhs),
-      OperatorType::LessEqual => self.leq(lhs, rhs),
-      OperatorType::Less => self.le(lhs, rhs),
-      OperatorType::Greater => self.ge(lhs, rhs),
-      OperatorType::GreaterEqual => self.ge(lhs, rhs),
-      OperatorType::And => self.and(lhs, rhs),
-      OperatorType::Or => self.or(lhs, rhs),
-      _ => Err("Invalid operator".to_owned()),
-    }
+    let toret = match op {
+      OperatorType::Div => self.div(lhs, rhs)?,
+      OperatorType::Times => self.mul(lhs, rhs)?,
+      OperatorType::Plus => self.add(lhs, rhs)?,
+      OperatorType::Minus => self.sub(lhs, rhs)?,
+      OperatorType::Modulo => self.modulo(lhs, rhs)?,
+      OperatorType::Equal => self.eq(lhs, rhs)?,
+      OperatorType::NotEqual => self.neq(lhs, rhs)?,
+      OperatorType::LessEqual => self.leq(lhs, rhs)?,
+      OperatorType::Less => self.le(lhs, rhs)?,
+      OperatorType::Greater => self.ge(lhs, rhs)?,
+      OperatorType::GreaterEqual => self.ge(lhs, rhs)?,
+      OperatorType::And => self.and(lhs, rhs)?,
+      OperatorType::Or => self.or(lhs, rhs)?,
+      _ => return Err("Invalid operator".to_owned()),
+    };
+    Ok(toret)
   }
 
   fn process_loop(&mut self, master: &Node) -> Result<(), String> {
     let raw_condition = &master.get_child()[0].get_child()[0];
-
-    println!("Type: {:?}", raw_condition.get_type());
 
     while self.eval_condition(raw_condition)? {
       self.process_node(&master.get_child()[1])?;
@@ -277,7 +276,7 @@ impl Interpreter {
   fn leq(&self, lhs: Value, rhs: Value) -> Result<Value, String> {
     match lhs {
       Value::Number(lh) => match rhs {
-        Value::Number(rh) => Ok(Value::Bool(rh <= lh)),
+        Value::Number(rh) => Ok(Value::Bool(lh <= rh)),
         _ => Ok(Value::Nil),
       },
       _ => Ok(Value::Nil),
@@ -286,7 +285,7 @@ impl Interpreter {
   fn le(&self, lhs: Value, rhs: Value) -> Result<Value, String> {
     match lhs {
       Value::Number(lh) => match rhs {
-        Value::Number(rh) => Ok(Value::Bool(rh < lh)),
+        Value::Number(rh) => Ok(Value::Bool(lh < rh)),
         _ => Ok(Value::Nil),
       },
       _ => Ok(Value::Nil),
@@ -296,7 +295,7 @@ impl Interpreter {
   fn geq(&self, lhs: Value, rhs: Value) -> Result<Value, String> {
     match lhs {
       Value::Number(lh) => match rhs {
-        Value::Number(rh) => Ok(Value::Bool(rh >= lh)),
+        Value::Number(rh) => Ok(Value::Bool(lh >= rh)),
         _ => Ok(Value::Nil),
       },
       _ => Ok(Value::Nil),
@@ -306,7 +305,7 @@ impl Interpreter {
   fn ge(&self, lhs: Value, rhs: Value) -> Result<Value, String> {
     match lhs {
       Value::Number(lh) => match rhs {
-        Value::Number(rh) => Ok(Value::Bool(rh > lh)),
+        Value::Number(rh) => Ok(Value::Bool(lh > rh)),
         _ => Ok(Value::Nil),
       },
       _ => Ok(Value::Nil),
