@@ -1,5 +1,5 @@
 mod core;
-mod nixt_std;
+mod stdlib;
 mod tests;
 mod utils;
 

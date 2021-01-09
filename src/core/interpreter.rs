@@ -1,4 +1,4 @@
-use crate::nixt_std;
+use crate::stdlib;
 use crate::utils::element::*;
 use crate::utils::node::*;
 use std::collections::BTreeMap;
@@ -127,16 +127,14 @@ impl Interpreter {
 
     match val.get_child()[0].get_type() {
       NodeType::Func => Ok(self.proc_fun_def(&val.get_child()[0])?),
-      NodeType::Operator(op) => self.proc_operator(op, val),
+      NodeType::Operator(op) => self.proc_operator(op, &val.get_child()[0]),
       NodeType::Block => Ok(self.process_inner_block(val)?),
       _ => Ok(Value::Nil),
     }
   }
   fn proc_operator(&self, op: OperatorType, val: &Node) -> Result<Value, String> {
-    let operator_character = &val.get_child()[0];
-
-    let lhs = match operator_character.get_child()[0].get_type() {
-      NodeType::Block => self.process_inner_block(&operator_character.get_child()[0])?,
+    let lhs = match val.get_child()[0].get_type() {
+      NodeType::Block => self.process_inner_block(&val.get_child()[0])?,
       NodeType::NodeNumber(n) => Value::Number(n),
       NodeType::NodeStr(s) => Value::String(s),
       NodeType::NodeBool(b) => Value::Bool(b),
@@ -151,8 +149,8 @@ impl Interpreter {
       _ => return Err("Invalid element".to_owned()),
     };
 
-    let rhs = match operator_character.get_child()[1].get_type() {
-      NodeType::Block => self.process_inner_block(&operator_character.get_child()[1])?,
+    let rhs = match val.get_child()[1].get_type() {
+      NodeType::Block => self.process_inner_block(&val.get_child()[1])?,
       NodeType::NodeNumber(n) => Value::Number(n),
       NodeType::NodeStr(s) => Value::String(s),
       NodeType::NodeBool(b) => Value::Bool(b),
@@ -183,6 +181,33 @@ impl Interpreter {
       OperatorType::Or => self.or(lhs, rhs),
       _ => Err("Invalid operator".to_owned()),
     }
+  }
+
+  fn process_loop(&mut self, master: &Node) -> Result<(), String> {
+    let raw_condition = &master.get_child()[0].get_child()[0];
+
+    println!("Type: {:?}", raw_condition.get_type());
+
+    while self.eval_condition(raw_condition)? {
+      self.process_node(&master.get_child()[1])?;
+    }
+
+    Ok(())
+  }
+
+  fn eval_condition(&self, cdn: &Node) -> Result<bool, String> {
+    let t = if let NodeType::Operator(op) = cdn.get_type() {
+      op
+    } else {
+      return Err(format!("Found invalid operator: {}", cdn));
+    };
+    let processed = self.proc_operator(t, cdn)?;
+    let you_have_been_banboolzled = if let Value::Bool(b) = processed {
+      b
+    } else {
+      return Err("Attempted to use a non-boolean value as a condition".to_owned());
+    };
+    Ok(you_have_been_banboolzled)
   }
 
   fn and(&self, lhs: Value, rhs: Value) -> Result<Value, String> {
@@ -384,8 +409,10 @@ impl Interpreter {
             as_value.push(topsh);
           }
           if &func == "print" {
-            nixt_std::io::print(&as_value);
+            stdlib::io::print(&as_value);
           }
+        } else if let NodeType::Loop = t {
+          self.process_loop(&instruction)?;
         }
       }
     }
