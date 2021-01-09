@@ -194,6 +194,22 @@ impl Interpreter {
     Ok(())
   }
 
+  fn process_if(&mut self, master: &Node) -> Result<(), String> {
+    let raw_condition = &master.get_child()[0].get_child()[0];
+
+    if self.eval_condition(raw_condition)? {
+      self.process_node(&master.get_child()[1])?;
+    } else {
+      if &master.get_child()[2].get_type() == &NodeType::None {
+        return Ok(());
+      } else {
+        self.process_node(&master.get_child()[2])?;
+      }
+    }
+
+    Ok(())
+  }
+
   fn eval_condition(&self, cdn: &Node) -> Result<bool, String> {
     let t = if let NodeType::Operator(op) = cdn.get_type() {
       op
@@ -412,6 +428,8 @@ impl Interpreter {
           }
         } else if let NodeType::Loop = t {
           self.process_loop(&instruction)?;
+        } else if let NodeType::Condition = t {
+          self.process_if(&instruction)?;
         }
       }
     }
