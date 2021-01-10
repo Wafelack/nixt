@@ -455,10 +455,7 @@ impl Interpreter {
         return Err("Attempted to call an undefined function".to_owned());
       }
     } else {
-      return Err(
-        "This should not be called, if you see this, please open an issue. Error code: 0x1C2"
-          .to_owned(),
-      );
+      panic!("This should not be called, if you see this, please open an issue.");
     };
     if args.len() != func_args.len() {
       return Err(format!(
