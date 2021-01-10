@@ -11,7 +11,6 @@ fn is_defined(scope: &BTreeMap<String, (Value, bool)>, name: &String) -> bool {
 }
 
 pub struct Interpreter {
-  ast: Node,
   scopes: Vec<BTreeMap<String, (Value, bool)>>,
 }
 
@@ -480,12 +479,23 @@ impl Interpreter {
     self.remove_scope();
     Ok(())
   }
-  pub fn run(ast: Node) -> Result<(), String> {
-    let mut interpreter = Self {
-      ast: ast.clone(),
-      scopes: vec![],
+  pub fn new(ast: Option<&Node>) -> Result<Interpreter, String> {
+    let toret = if ast.is_some() {
+      let mut interpreter = Interpreter { scopes: vec![] };
+      interpreter.process_node(&ast.unwrap())?;
+
+      interpreter
+    } else {
+      let interpreter = Interpreter {
+        scopes: vec![BTreeMap::new()],
+      };
+
+      interpreter
     };
-    interpreter.process_node(&ast)
+    Ok(toret)
+  }
+  pub fn process_ast(&mut self, ast: &Node) -> Result<(), String> {
+    self.process_node(ast)
   }
 }
 

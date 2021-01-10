@@ -9,6 +9,7 @@ use self::core::parser::*;
 use std::io::Write;
 
 fn main() -> Result<(), String> {
+    let mut interpreter = Interpreter::new(None)?;
     loop {
         let mut input = String::new();
         print!("> ");
@@ -34,6 +35,6 @@ fn main() -> Result<(), String> {
             }
             panic!("{} parsing errors occured !", err_unwraped.len());
         }
-        Interpreter::run(ast)?;
+        interpreter.process_ast(&ast)?;
     }
 }
