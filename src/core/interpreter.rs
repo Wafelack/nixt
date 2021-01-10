@@ -127,7 +127,7 @@ impl Interpreter {
     match val.get_child()[0].get_type() {
       NodeType::Func => Ok(self.proc_fun_def(&val.get_child()[0])?),
       NodeType::Operator(op) => self.proc_operator(op, &val.get_child()[0]),
-      NodeType::Block => Ok(self.process_inner_block(val)?),
+      NodeType::Block => Ok(self.process_inner_block(&val.get_child()[0])?),
       _ => Ok(Value::Nil),
     }
   }
