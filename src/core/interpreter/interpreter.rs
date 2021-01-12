@@ -15,19 +15,13 @@ pub struct Interpreter {
 
 impl Interpreter {
   pub fn new(ast: Option<&Node>) -> Result<Interpreter, String> {
-    let toret = if ast.is_some() {
-      let mut interpreter = Interpreter { scopes: vec![] };
-      interpreter.process_node(&ast.unwrap())?;
-
-      interpreter
-    } else {
-      let interpreter = Interpreter {
-        scopes: vec![BTreeMap::new()],
-      };
-
-      interpreter
+    let mut interpreter = Interpreter {
+      scopes: vec![BTreeMap::new()],
     };
-    Ok(toret)
+    if ast.is_some() {
+      interpreter.process_node(&ast.unwrap())?;
+    }
+    Ok(interpreter)
   }
   pub fn add_scope(&mut self) {
     self.scopes.push(BTreeMap::new())
