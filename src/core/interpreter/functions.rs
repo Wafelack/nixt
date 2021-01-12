@@ -54,7 +54,6 @@ impl Interpreter {
         .insert(func_args[i].clone(), (args[i].clone(), false));
     }
     let toret = self.process_node(&body)?;
-    println!("{:?}", toret);
     self.remove_scope();
     Ok(toret) // Temporary, I will implement return later
   }
@@ -81,9 +80,6 @@ impl Interpreter {
       };
       as_value.push(topsh);
     }
-
-    eprintln!("Type: {:?}", func);
-
     let fname = if let NodeType::FunctionCall(name) = func.get_type() {
       // Should always be true
       name
