@@ -3,7 +3,7 @@ mod stdlib;
 mod tests;
 mod utils;
 
-use self::core::interpreter::*;
+use self::core::interpreter::interpreter::*;
 use self::core::lexer::*;
 use self::core::parser::*;
 use std::io::Write;
