@@ -34,32 +34,7 @@ impl Interpreter {
             )?;
           }
         } else if let NodeType::FunctionCall(func) = t {
-          let mut as_value = vec![];
-          for child in children {
-            let topsh = match child.get_type() {
-              NodeType::Block => self.process_inner_block(&child)?,
-              NodeType::NodeBool(b) => Value::Bool(b),
-              NodeType::NodeNumber(n) => Value::Number(n),
-              NodeType::NodeStr(s) => Value::String(s),
-              NodeType::None => Value::Nil,
-              NodeType::NodeIdentifier(s) => {
-                if self.get_value(&s).is_some() {
-                  self.get_value(&s).unwrap()
-                } else {
-                  return Err("Attempted to use an undefined function: `{}`, s".to_owned());
-                }
-              }
-              _ => return Err("Unexpected value".to_owned()),
-            };
-            as_value.push(topsh);
-          }
-          if &func == "print" {
-            stdlib::io::print(&as_value);
-          } else if &func == "puts" {
-            stdlib::io::puts(&as_value);
-          } else {
-            self.process_func_call(&instruction, &as_value)?;
-          }
+          self.process_func(&instruction);
         } else if let NodeType::Loop = t {
           self.process_loop(&instruction)?;
         } else if let NodeType::Condition = t {

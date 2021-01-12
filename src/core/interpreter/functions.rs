@@ -1,4 +1,5 @@
 use crate::core::interpreter::interpreter::Interpreter;
+use crate::stdlib;
 use crate::utils::{element::*, node::*};
 
 impl Interpreter {
@@ -18,7 +19,7 @@ impl Interpreter {
       body: val.get_child()[1].clone(),
     }))
   }
-  pub fn process_func_call(&mut self, function: &Node, args: &Vec<Value>) -> Result<(), String> {
+  pub fn process_func_call(&mut self, function: &Node, args: &Vec<Value>) -> Result<Value, String> {
     let (func_args, body) = if let NodeType::FunctionCall(s) = function.get_type() {
       if self.get_value(&s).is_some() {
         let raw_func = self.get_value(&s).unwrap();
@@ -54,6 +55,44 @@ impl Interpreter {
     }
     self.process_node(&body)?;
     self.remove_scope();
-    Ok(())
+    Ok(Value::Nil) // Temporary, I will implement return later
+  }
+
+  pub fn process_func(&mut self, func: &Node) -> Result<Value, String> {
+    let children = &func.get_child();
+    let mut as_value = vec![];
+    for child in children {
+      let topsh = match child.get_type() {
+        NodeType::Block => self.process_inner_block(&child)?,
+        NodeType::NodeBool(b) => Value::Bool(b),
+        NodeType::NodeNumber(n) => Value::Number(n),
+        NodeType::NodeStr(s) => Value::String(s),
+        NodeType::None => Value::Nil,
+        NodeType::NodeIdentifier(s) => {
+          if self.get_value(&s).is_some() {
+            self.get_value(&s).unwrap()
+          } else {
+            return Err("Attempted to use an undefined function: `{}`, s".to_owned());
+          }
+        }
+        _ => return Err("Unexpected value".to_owned()),
+      };
+      as_value.push(topsh);
+    }
+
+    let fname = if let NodeType::FunctionCall(name) = func.get_type() {
+      // Should always be true
+      name
+    } else {
+      panic!("Invalid function call");
+    };
+
+    if &fname == &"print" {
+      return stdlib::io::print(&as_value);
+    } else if &fname == &"puts" {
+      return stdlib::io::puts(&as_value);
+    } else {
+      return self.process_func_call(&func, &as_value);
+    }
   }
 }
