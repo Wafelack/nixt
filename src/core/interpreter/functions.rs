@@ -53,9 +53,10 @@ impl Interpreter {
         .unwrap()
         .insert(func_args[i].clone(), (args[i].clone(), false));
     }
-    self.process_node(&body)?;
+    let toret = self.process_node(&body)?;
+    println!("{:?}", toret);
     self.remove_scope();
-    Ok(Value::Nil) // Temporary, I will implement return later
+    Ok(toret) // Temporary, I will implement return later
   }
 
   pub fn process_func(&mut self, func: &Node) -> Result<Value, String> {
@@ -72,19 +73,22 @@ impl Interpreter {
           if self.get_value(&s).is_some() {
             self.get_value(&s).unwrap()
           } else {
-            return Err("Attempted to use an undefined function: `{}`, s".to_owned());
+            return Err("Attempted to use an undefined variable: `{}`, s".to_owned());
           }
         }
-        _ => return Err("Unexpected value".to_owned()),
+        NodeType::FunctionCall(_) => self.process_func(child)?,
+        x => return Err(format!("Unexpected value: {:?}", x)),
       };
       as_value.push(topsh);
     }
+
+    eprintln!("Type: {:?}", func);
 
     let fname = if let NodeType::FunctionCall(name) = func.get_type() {
       // Should always be true
       name
     } else {
-      panic!("Invalid function call");
+      return Err("Invalid function call".to_owned());
     };
 
     if &fname == &"print" {

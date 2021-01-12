@@ -131,7 +131,8 @@ impl Interpreter {
   }
 
   pub fn process_ast(&mut self, ast: &Node) -> Result<(), String> {
-    self.process_node(ast)
+    self.process_node(ast)?;
+    Ok(())
   }
 }
 
