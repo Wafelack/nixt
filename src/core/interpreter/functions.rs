@@ -3,7 +3,7 @@ use crate::stdlib;
 use crate::utils::{element::*, node::*};
 
 impl Interpreter {
-  pub fn proc_fun_def(&self, val: &Node) -> Result<Value, String> {
+  pub fn proc_fun_def(&mut self, val: &Node) -> Result<Value, String> {
     let mut argstr = Vec::<String>::new();
     let args = val.get_child()[0].get_child();
     for arg in &args {

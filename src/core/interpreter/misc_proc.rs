@@ -22,7 +22,7 @@ impl Interpreter {
     }
     Ok(())
   }
-  pub fn proc_operator(&self, op: OperatorType, val: &Node) -> Result<Value, String> {
+  pub fn proc_operator(&mut self, op: OperatorType, val: &Node) -> Result<Value, String> {
     let lhs = match val.get_child()[0].get_type() {
       NodeType::Block => self.process_inner_block(&val.get_child()[0])?,
       NodeType::NodeNumber(n) => Value::Number(n),

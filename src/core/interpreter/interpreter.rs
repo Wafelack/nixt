@@ -1,4 +1,3 @@
-use crate::stdlib;
 use crate::utils::element::*;
 use crate::utils::node::*;
 use std::collections::BTreeMap;
@@ -90,7 +89,7 @@ impl Interpreter {
       .insert(name, (value, is_const));
     Ok(())
   }
-  pub fn proc_value(&self, val: &Node) -> Result<Value, String> {
+  pub fn proc_value(&mut self, val: &Node) -> Result<Value, String> {
     match val.get_type() {
       NodeType::NodeNumber(n) => return Ok(Value::Number(n)),
       NodeType::NodeStr(s) => return Ok(Value::String(s)),
@@ -106,7 +105,7 @@ impl Interpreter {
       _ => return Ok(Value::Nil),
     }
   }
-  pub fn get_value(&self, value: &String) -> Option<Value> {
+  pub fn get_value(&mut self, value: &String) -> Option<Value> {
     for i in (0..self.scopes.len()).rev() {
       let scope = &self.scopes[i];
       if scope.contains_key(value) {
@@ -116,7 +115,7 @@ impl Interpreter {
     None
   }
 
-  pub fn eval_condition(&self, cdn: &Node) -> Result<bool, String> {
+  pub fn eval_condition(&mut self, cdn: &Node) -> Result<bool, String> {
     let t = if let NodeType::Operator(op) = cdn.get_type() {
       op
     } else {

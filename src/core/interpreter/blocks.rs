@@ -1,5 +1,4 @@
 use crate::core::interpreter::interpreter::*;
-use crate::stdlib;
 use crate::utils::{element::*, node::*};
 
 impl Interpreter {
@@ -33,8 +32,8 @@ impl Interpreter {
               &children[1],
             )?;
           }
-        } else if let NodeType::FunctionCall(func) = t {
-          self.process_func(&instruction);
+        } else if let NodeType::FunctionCall(_) = t {
+          self.process_func(&instruction)?;
         } else if let NodeType::Loop = t {
           self.process_loop(&instruction)?;
         } else if let NodeType::Condition = t {
@@ -44,7 +43,7 @@ impl Interpreter {
     }
     Ok(())
   }
-  pub fn process_inner_block(&self, val: &Node) -> Result<Value, String> {
+  pub fn process_inner_block(&mut self, val: &Node) -> Result<Value, String> {
     if val.get_child().len() < 1 {
       return Ok(Value::Nil);
     }
@@ -52,6 +51,7 @@ impl Interpreter {
     match val.get_child()[0].get_type() {
       NodeType::Func => Ok(self.proc_fun_def(&val.get_child()[0])?),
       NodeType::Operator(op) => self.proc_operator(op, &val.get_child()[0]),
+      NodeType::FunctionCall(_) => self.process_func(&val),
       NodeType::Block => Ok(self.process_inner_block(&val.get_child()[0])?),
       _ => Ok(Value::Nil),
     }
