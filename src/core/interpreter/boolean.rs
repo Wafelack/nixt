@@ -1,5 +1,5 @@
 use crate::core::interpreter::interpreter::Interpreter;
-use crate::utils::{element::*, node::*};
+use crate::utils::element::*;
 
 impl Interpreter {
   pub fn and(&self, lhs: Value, rhs: Value) -> Result<Value, String> {

@@ -164,6 +164,8 @@ fn process_std(name: &str, args: &Vec<Value>) -> (bool, Result<Value, String>) {
     stdlib::list::list(args)
   } else if &name == &"pop" {
     stdlib::list::pop(args)
+  } else if &name == &"assert" {
+    stdlib::assert::assert(args)
   } else {
     found = false;
     Ok(Value::Nil)

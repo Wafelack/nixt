@@ -1,10 +1,7 @@
 #[cfg(test)]
 mod test {
   use crate::{
-    core::lexer::*,
-    core::parser::*,
-    utils::node::*,
-    utils::token::{TokenType::*, *},
+    core::interpreter::interpreter::Interpreter, core::lexer::*, core::parser::*, utils::node::*,
   };
 
   fn get_ast(code: &str) -> Result<String, String> {
@@ -26,6 +23,29 @@ mod test {
     }
 
     Ok(stringify(&ast, 0))
+  }
+
+  fn run(code: &str) -> Result<(), String> {
+    let mut lexer = Lexer::new(code);
+    let tokens = lexer.scan_tokens();
+    if lexer.get_errors().is_some() {
+      return Err(format!(
+        "Lexing errors occured: {:?}",
+        lexer.get_errors().unwrap()
+      ));
+    }
+    let mut parser = Parser::new(tokens);
+    let ast = parser.parse();
+    if parser.get_errors().is_some() {
+      return Err(format!(
+        "Parsing errors occured: {:?}",
+        parser.get_errors().unwrap()
+      ));
+    }
+
+    Interpreter::new(Some(&ast))?;
+
+    Ok(())
   }
 
   #[test]
@@ -184,6 +204,60 @@ mod test {
       .to_owned();
 
     assert_eq!(got.trim(), expected.trim());
+    Ok(())
+  }
+
+  #[test]
+  fn scoping() -> Result<(), String> {
+    let code = r#"
+    (let foo "bar")
+    {
+      (let foo "foo")
+    }
+    (assert (= foo "bar"))
+    "#;
+    run(code)?;
+    Ok(())
+  }
+
+  #[test]
+  fn functions() -> Result<(), String> {
+    let code = r#"
+    (let square (func (n) {(ret (* n n))}))
+    (assert (= (square 2) 4))
+    (assert (= (square 4) 16))
+    (assert (= (square 17) 289))
+    "#;
+    run(code)?;
+
+    Ok(())
+  }
+  #[test]
+  fn loops() -> Result<(), String> {
+    let code = r#"
+    (let i 0)
+    (while (< i 10) {
+      (set i (+ i 1))
+    })
+    (assert (= i 10))
+    "#;
+    run(code)?;
+
+    Ok(())
+  }
+  #[test]
+  fn conditions() -> Result<(), String> {
+    let code = r#"
+    (let foo "bar")
+    (let bar "")
+    (if (= foo "foo") (
+      (set bar foo)
+      (set bar "NOTBAR")
+    ))
+    (assert (~ bar "NOTBAR"))
+    "#;
+    run(code)?;
+
     Ok(())
   }
 }

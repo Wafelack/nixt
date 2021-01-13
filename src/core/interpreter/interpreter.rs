@@ -129,16 +129,3 @@ impl Interpreter {
     Ok(())
   }
 }
-
-pub fn display_scope(scope: &BTreeMap<String, (Value, bool)>) {
-  println!("{{");
-  for (key, (value, is_const)) in scope {
-    println!(
-      "{}: {} ({})",
-      key,
-      value,
-      if *is_const { "const" } else { "mutable" }
-    );
-  }
-  println!("}}");
-}

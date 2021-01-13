@@ -7,8 +7,6 @@ impl Interpreter {
       if instruction.get_type() == NodeType::Scope {
         self.add_scope();
         self.process_node(&instruction)?;
-        print!("{} -> ", self.scopes.len() - 1,); // DEBUG
-        display_scope(&self.scopes[self.scopes.len() - 1]); // DEBUG
         self.remove_scope();
       } else if instruction.get_type() == NodeType::Block {
         if self.scopes.len() == 0 {
