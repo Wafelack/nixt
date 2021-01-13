@@ -19,7 +19,11 @@ impl std::fmt::Display for Value {
     match self {
       Self::String(s) => write!(f, "{}", s)?,
       Self::Number(n) => write!(f, "{}", n)?,
-      Self::List(l) => write!(f, "{:?}", l)?,
+      Self::List(l) => {
+        for val in l {
+          write!(f, "{} ", val)?;
+        }
+      }
       Self::Bool(b) => write!(f, "{}", b)?,
       Self::Func(fnc) => write!(f, "{}", fnc)?,
       Self::Nil => write!(f, "nil")?,

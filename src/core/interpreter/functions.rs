@@ -160,6 +160,10 @@ fn process_std(name: &str, args: &Vec<Value>) -> (bool, Result<Value, String>) {
     stdlib::time::now()
   } else if &name == &"str:cat" {
     stdlib::str::cat(args)
+  } else if &name == &"list" {
+    stdlib::list::list(args)
+  } else if &name == &"pop" {
+    stdlib::list::pop(args)
   } else {
     found = false;
     Ok(Value::Nil)
