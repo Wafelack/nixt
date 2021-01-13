@@ -64,7 +64,7 @@ impl Interpreter {
       OperatorType::LessEqual => self.leq(lhs, rhs)?,
       OperatorType::Less => self.le(lhs, rhs)?,
       OperatorType::Greater => self.ge(lhs, rhs)?,
-      OperatorType::GreaterEqual => self.ge(lhs, rhs)?,
+      OperatorType::GreaterEqual => self.geq(lhs, rhs)?,
       OperatorType::And => self.and(lhs, rhs)?,
       OperatorType::Or => self.or(lhs, rhs)?,
     };
