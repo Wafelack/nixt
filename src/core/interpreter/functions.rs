@@ -99,13 +99,43 @@ impl Interpreter {
     }
   }
   pub fn process_import(&mut self, to_import: &Vec<Value>) -> Result<Value, String> {
+    let mut import_in_ast = |fname: &str| -> Result<(), String> {
+      let code = match std::fs::read_to_string(fname) {
+        Ok(c) => c,
+        Err(_) => return Err("Failed to read module code".to_owned()),
+      };
+
+      let mut lexer = crate::core::lexer::Lexer::new(&code);
+      let tokens = lexer.scan_tokens();
+      if lexer.get_errors().is_some() {
+        return Err("The imported file contains lexing errors. Aborting".to_owned());
+      }
+      let mut parser = crate::core::parser::Parser::new(tokens);
+      let ast = parser.parse();
+      if parser.get_errors().is_some() {
+        return Err("The imported file contains parsing errors. Aborting".to_owned());
+      }
+      self.process_ast(&ast)?;
+
+      Ok(())
+    };
     for val in to_import {
       if let Value::String(s) = val {
         if Path::new(s).exists() {
-          unimplemented!();
+          import_in_ast(&s)?;
         } else {
           if s.starts_with("std/") {
-            unimplemented!();
+            let folder = match std::env::var("NIXT_STD") {
+              Ok(res) => res,
+              _ => return Err("Could not find NIXT_STD environnement variable. Consider creating it to import std modules.".to_owned()),
+            };
+
+            let to_import = format!("{}/{}.nxt", folder, &s[4..]);
+            if !Path::new(&to_import).exists() {
+              return Err(format!("Could not find standard module `{}`", &s[4..]));
+            }
+
+            import_in_ast(&to_import)?;
           } else {
             return Err(format!("Unresolved import: `{}`", s));
           }
