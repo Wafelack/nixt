@@ -186,39 +186,4 @@ mod test {
     assert_eq!(got.trim(), expected.trim());
     Ok(())
   }
-
-  #[test]
-  fn parse_if() -> Result<(), String> {
-    let got = get_ast("{(while (< 5 6) {})}")?;
-    let expected = r#"{
-@type : Scope
-@children : {
-  @type : Block
-  @children : {
-    @type : Loop
-    @children : {   
-      @type : Block
-      @children : {
-        @type : Operator(Less)
-        @children : {
-          @type : NodeNumber(5.0)
-          @children : {
-            }
-          @type : NodeNumber(6.0)
-          @children : {
-            }
-          }
-        }
-      @type : Scope
-      @children : {
-        }
-      }
-    }
-  }
-}"#
-      .to_owned();
-
-    assert_eq!(got.trim(), expected.trim());
-    Ok(())
-  }
 }

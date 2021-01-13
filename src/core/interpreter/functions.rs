@@ -88,10 +88,10 @@ impl Interpreter {
       return Err("Invalid function call".to_owned());
     };
 
-    if &fname == &"print" {
-      return stdlib::io::print(&as_value);
-    } else if &fname == &"puts" {
-      return stdlib::io::puts(&as_value);
+    let processed = process_std(&fname, &as_value);
+
+    if processed.0 {
+      return processed.1;
     } else if &fname == &"import" {
       return self.process_import(&as_value);
     } else {
@@ -147,4 +147,21 @@ impl Interpreter {
 
     Ok(Value::Nil)
   }
+}
+
+fn process_std(name: &str, args: &Vec<Value>) -> (bool, Result<Value, String>) {
+  let mut found = true;
+
+  let toret = if &name == &"print" {
+    stdlib::io::print(&args)
+  } else if &name == &"puts" {
+    stdlib::io::puts(&args)
+  } else if &name == &"time:now" {
+    stdlib::time::now()
+  } else {
+    found = false;
+    Ok(Value::Nil)
+  };
+
+  (found, toret)
 }
