@@ -158,6 +158,8 @@ fn process_std(name: &str, args: &Vec<Value>) -> (bool, Result<Value, String>) {
     stdlib::io::puts(&args)
   } else if &name == &"time:now" {
     stdlib::time::now()
+  } else if &name == &"str:cat" {
+    stdlib::str::cat(args)
   } else {
     found = false;
     Ok(Value::Nil)
