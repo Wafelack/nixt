@@ -81,7 +81,7 @@ impl Lexer {
             }
             '%' => {
                 if self.match_('%') {
-                   self.multi_line_comment();
+                    self.multi_line_comment();
                 } else {
                     self.add_token(Percent);
                 }

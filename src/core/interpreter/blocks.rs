@@ -2,7 +2,7 @@ use crate::core::interpreter::interpreter::*;
 use crate::utils::{element::*, node::*};
 
 impl Interpreter {
-  pub fn process_node(&mut self, node: &Node) -> Result<Value, String> {
+  pub fn process_node(&mut self, node: &Node) -> Result<Option<Value>, String> {
     for instruction in node.get_child() {
       if instruction.get_type() == NodeType::Scope {
         self.add_scope();
@@ -14,7 +14,10 @@ impl Interpreter {
         if self.scopes.len() == 0 {
           return Err("No scopes available. Consider adding a scope to your program".to_owned());
         }
-        self.process_node(&instruction)?;
+        let returned = self.process_node(&instruction)?;
+        if returned.is_some() {
+          return Ok(returned);
+        }
       } else {
         if self.scopes.len() == 0 {
           return Err("No scopes available. Consider adding a scope to your program".to_owned());
@@ -40,11 +43,11 @@ impl Interpreter {
           self.process_if(&instruction)?;
         } else if let NodeType::Return = t {
           // Return should have one children
-          return self.proc_value(&instruction.get_child()[0]);
+          return Ok(Some(self.proc_value(&instruction.get_child()[0])?));
         }
       }
     }
-    Ok(Value::Nil)
+    Ok(None)
   }
   pub fn process_inner_block(&mut self, val: &Node) -> Result<Value, String> {
     if val.get_child().len() < 1 {
@@ -56,10 +59,6 @@ impl Interpreter {
       NodeType::Operator(op) => self.proc_operator(op, &val.get_child()[0]),
       NodeType::FunctionCall(_) => self.process_func(&val.get_child()[0]),
       NodeType::Block => Ok(self.process_inner_block(&val.get_child()[0])?),
-      NodeType::Return => {
-        eprintln!("{:?}", &val.get_child()[0]);
-        Ok(self.proc_value(&val.get_child()[0].get_child()[0])?)
-      }
       _ => Ok(Value::Nil),
     }
   }

@@ -1,6 +1,7 @@
 use crate::core::interpreter::interpreter::Interpreter;
 use crate::stdlib;
 use crate::utils::{element::*, node::*};
+use std::path::Path;
 
 impl Interpreter {
   pub fn proc_fun_def(&mut self, val: &Node) -> Result<Value, String> {
@@ -55,7 +56,7 @@ impl Interpreter {
     }
     let toret = self.process_node(&body)?;
     self.remove_scope();
-    Ok(toret) // Temporary, I will implement return later
+    Ok(toret.unwrap_or(Value::Nil))
   }
 
   pub fn process_func(&mut self, func: &Node) -> Result<Value, String> {
@@ -91,8 +92,29 @@ impl Interpreter {
       return stdlib::io::print(&as_value);
     } else if &fname == &"puts" {
       return stdlib::io::puts(&as_value);
+    } else if &fname == &"import" {
+      return self.process_import(&as_value);
     } else {
       return self.process_func_call(&func, &as_value);
     }
+  }
+  pub fn process_import(&mut self, to_import: &Vec<Value>) -> Result<Value, String> {
+    for val in to_import {
+      if let Value::String(s) = val {
+        if Path::new(s).exists() {
+          unimplemented!();
+        } else {
+          if s.starts_with("std/") {
+            unimplemented!();
+          } else {
+            return Err(format!("Unresolved import: `{}`", s));
+          }
+        }
+      } else {
+        continue;
+      }
+    }
+
+    Ok(Value::Nil)
   }
 }
