@@ -15,7 +15,7 @@ echo "[+] Cloning release from repo"
 tar -xf nixt.tar.gz
 echo "[+] Extracting cloned archive"
 echo 'export PATH="~/.nixt/:$PATH"' >> ~/.bashrc
-echo 'export NIXT_PATH="~/.nixt/std"' >> ~/.bashrc
+echo 'export NIXT_STD="~/.nixt/std"' >> ~/.bashrc
 echo "[+] Added nixt to path"
 cd $start_dir
 echo "Successfully installed nixt !"
