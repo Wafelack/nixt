@@ -20,9 +20,15 @@ impl std::fmt::Display for Value {
       Self::String(s) => write!(f, "{}", s)?,
       Self::Number(n) => write!(f, "{}", n)?,
       Self::List(l) => {
-        for val in l {
-          write!(f, "{} ", val)?;
+        write!(f, "[")?;
+        for i in 0..l.len() {
+          if i + 1 < l.len() {
+            write!(f, "{}, ", l[i]);
+          } else {
+            write!(f, "{}", l[i]);
+          }
         }
+        write!(f, "]")?;
       }
       Self::Bool(b) => write!(f, "{}", b)?,
       Self::Func(fnc) => write!(f, "{}", fnc)?,

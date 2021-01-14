@@ -1,5 +1,5 @@
 # @name: str:substr
-# @description: splits s on the delimiter d
+# @description: Gets a substring from str
 # @params: 
 #   - str: the string
 #   - s: the start
@@ -12,5 +12,31 @@
     (set toret (push toret (at str s)))
     (set s (+ s 1))
   })
+  (ret toret)
+}))
+
+# @name: str:split
+# @description: splits s on the delimiter d
+# @params: 
+#   - str: the string
+#   - d: the delimiter
+# @return: list
+# @author: Wafelack <wafelack@protonmail.com>
+(let str:split (func (str d) {
+  (let toret (list))
+  (let start 0)
+  (let current 0)
+  (let cur_char "")
+  (while (< current (len str)) {
+    (set cur_char (at str current))
+    (set current (+ current 1))
+    (if (= cur_char d) 
+      (
+        (set toret (push toret (str:substr str start (- current 1))))
+        (set start current)
+      )
+    )
+  })
+  (set toret (push toret (str:substr str start (len str))))
   (ret toret)
 }))
