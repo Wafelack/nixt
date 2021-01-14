@@ -172,16 +172,10 @@ impl Lexer {
         self.add_token(Str(value));
     }
     fn peek(&self) -> char {
-        if self.is_at_end() {
-            return '\0';
-        }
-        self.source.chars().collect::<Vec<char>>()[self.current]
+        self.source.chars().nth(self.current).unwrap_or('\0')
     }
     fn peek_next(&self) -> char {
-        if self.current + 1 >= self.source.len() {
-            return '\0';
-        }
-        self.source.chars().collect::<Vec<char>>()[self.current + 1]
+        self.source.chars().nth(self.current + 1).unwrap_or('\0')
     }
 
     pub fn get_errors(&self) -> Option<Vec<String>> {
@@ -191,10 +185,7 @@ impl Lexer {
         Some(self.errors.clone())
     }
     fn match_(&mut self, expected: char) -> bool {
-        if self.is_at_end() {
-            return false;
-        }
-        if self.source.chars().collect::<Vec<char>>()[self.current] != expected {
+        if self.source.chars().nth(self.current) != Some(expected) {
             return false;
         }
 
@@ -203,7 +194,7 @@ impl Lexer {
     }
     fn advance(&mut self) -> char {
         self.current += 1;
-        self.source.chars().collect::<Vec<char>>()[self.current - 1]
+        self.source.chars().nth(self.current - 1).unwrap()
     }
     fn add_token(&mut self, typ: TokenType) {
         let text = (&self.source[self.start..self.current]).to_owned();
