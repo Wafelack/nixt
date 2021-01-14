@@ -88,3 +88,17 @@ pub fn index(args: &Vec<Value>) -> Result<Value, String> {
     return Ok(args[0].to_owned());
   }
 }
+
+pub fn len(args: &Vec<Value>) -> Result<Value, String> {
+  if args.len() < 1 {
+    return Ok(Value::Nil);
+  }
+
+  if let Value::String(s) = &args[0] {
+    return Ok(Value::Number(s.len() as f32));
+  } else if let Value::List(l) = &args[0] {
+    return Ok(Value::Number(l.len() as f32));
+  } else {
+    return Ok(Value::Number(0.));
+  }
+}
