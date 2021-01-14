@@ -1,0 +1,126 @@
+# @name: math:abs
+# @description: Returns the absolute value of a number
+# @params: 
+#   - n: the number
+# @return: number | any*
+# @author: Wafelack <wafelack@protonmail.com>
+(let math:abs (func (n) {
+  (let toret 0)
+  (if (~ (type n) "number")
+    (set toret n)
+    (if (< n 0) 
+      (set toret (* -1 n))
+      (set toret n)
+  ))
+  (ret toret)
+}))
+
+# @name: math:inv
+# @description: Returns 1/n
+# @params: 
+#   - n: the number
+# @return: number | any*
+# @author: Wafelack <wafelack@protonmail.com>
+(let math:inv (func (n) {
+  (let toret 0)
+  (if (~ (type n) "number")
+    (set toret n)
+    (set toret (/ 1 n))
+  )
+  (ret toret)
+}))
+
+# @name: math:pow
+# @description: Returns x^y
+# @params: 
+#   - x: the number
+#   - y: the power
+# @return: number | any*
+# @author: Wafelack <wafelack@protonmail.com>
+(let math:pow (func (x y) {
+  (let toret 1)
+  (if (~ (type x) "number")
+    (set toret x)
+    (
+      (let i 0)
+      (while (< i y) {
+        (set toret (* toret x))
+        (set i (+ i 1))
+      }
+      ) 
+    )
+  (ret toret)
+)}))
+
+# @name: math:sqrt
+# @description: Returns sqrt(n)
+# @params: 
+#   - n: the number
+# @return: number | any*
+# @author: Wafelack <wafelack@protonmail.com>
+(let math:sqrt (func (n) {
+  (let toret 0)
+
+  (if (~ (type n) "number")
+    (set toret n)
+    (
+      (set toret (/ n 2))
+      (let i 0)
+      (while (< i 10) {
+        (set i (+ i 1))
+        (set toret (- toret ( /
+          (- (* toret toret) n)
+          (* 2 toret)
+        )))
+      })
+    )
+  )
+  (ret toret)
+}))
+
+# @name: math:max
+# @description: Returns x if x > y, else it returns y
+# @params: 
+#   - x: the first number
+#   - y: the second number
+# @return: number | any*
+# @author: Wafelack <wafelack@protonmail.com>
+(let math:max (func (x y) {
+  (let toret 0)
+
+  (if (or (~ (type x) "number") (~ (type y) "number"))
+    (set toret x)
+    (
+      (if (> x y)
+        (set toret x)
+        (set toret y)
+      )
+    )
+  )
+  (ret toret)
+}))
+
+# @name: math:min
+# @description: Returns x if x < y, else it returns y
+# @params: 
+#   - x: the first number
+#   - y: the second number
+# @return: number | any*
+# @author: Wafelack <wafelack@protonmail.com>
+(let math:min (func (x y) {
+  (let toret 0)
+
+  (if (or (~ (type x) "number") (~ (type y) "number"))
+    (set toret x)
+    (
+      (if (< x y)
+        (set toret x)
+        (set toret y)
+      )
+    )
+  )
+  (ret toret)
+}))
+
+(const math:EULER 2.718281828459045)
+(const math:PI 3.141592653589793238462643383279502884197169399375105820974944592397816406)

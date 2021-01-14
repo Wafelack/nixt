@@ -10,6 +10,7 @@ pub enum TokenType {
     Equal,
     Dot,
     Comma,
+    Percent,
     Plus,
     Minus,
     Star,

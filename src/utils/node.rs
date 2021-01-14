@@ -47,21 +47,22 @@ pub enum AssignType {
 }
 #[derive(Debug, Clone, PartialEq)]
 pub enum OperatorType {
-  Plus,
-  Minus,
-  Times,
-  Div,
-  Less,
-  LessEqual,
-  Greater,
-  GreaterEqual,
-  Equal,
-  NotEqual,
-  And,
-  Or,
+    Plus,
+    Minus,
+    Times,
+    Div,
+    Less,
+    LessEqual,
+    Greater,
+    GreaterEqual,
+    Equal,
+    NotEqual,
+    And,
+    Or,
+    Modulo
 }
 
-fn stringify(node: &Node, indentations: usize) -> String {
+pub fn stringify(node: &Node, indentations: usize) -> String {
   let mut toret = String::new();
   toret.push_str("{\n");
   for children in node.get_child() {

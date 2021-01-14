@@ -50,7 +50,13 @@ impl Lexer {
             ')' => self.add_token(RightParen),
             ',' => self.add_token(Comma),
             '.' => self.add_token(Dot),
-            '-' => self.add_token(Minus),
+            '-' => {
+                if self.peek().is_digit(10) {
+                    self.number();
+                } else {
+                    self.add_token(Minus);
+                }
+            }
             '+' => self.add_token(Plus),
             '*' => self.add_token(Star),
             '/' => self.add_token(Slash),
@@ -80,7 +86,11 @@ impl Lexer {
                 }
             }
             '%' => {
-                self.multi_line_comment();
+                if self.match_('%') {
+                    self.multi_line_comment();
+                } else {
+                    self.add_token(Percent);
+                }
             }
             ' ' | '\r' | '\t' => {}
             '"' => self.string('"'),
@@ -99,12 +109,13 @@ impl Lexer {
         }
     }
     fn multi_line_comment(&mut self) {
-        while self.peek() != '%' && !self.is_at_end() {
+        while self.peek() != '%' && self.peek_next() != '%' && !self.is_at_end() {
             if self.peek() == '\n' {
                 self.line += 1;
             }
             self.advance();
         }
+        self.advance(); // consume %
         self.advance(); // consume %
     }
     fn identifier(&mut self) {
