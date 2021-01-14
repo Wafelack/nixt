@@ -2,7 +2,7 @@
 
   Nixt
   ---
-  Nixt is an interpreted programming language written in Rust
+  Nixt is an interpreted lisp inspired programming language written in Rust
 
 </div>
 
@@ -11,7 +11,6 @@
 - [About](#about)
 - [Installation](#installation)
 - [Build](#build)
-- [TODO](#todo)
 
 # About
 
@@ -19,23 +18,13 @@ Nixt goal is to provide a fast and easy to learn scripting language that provide
 
 # Installation
 
-N/A
+Todo
 
 # Build
 
-## Prerequisties
-
-- You'll need `rustc` and `cargo`
-
-## How to
-
-- Clone the repo
-- Run `cargo test --verbose` to check viability of the code
-- Run `cargo build --release`
-
-# Todo
-
-- [x] - Write the parser
-- [ ] - Write the interpreter
-- [ ] - Write the standard library
-- [ ] - Add lists
+```sh
+git clone https://github.com/wafelack/nixt
+cd nixt/
+cargo test --release
+cargo build --release
+```
