@@ -23,9 +23,9 @@ impl std::fmt::Display for Value {
         write!(f, "[")?;
         for i in 0..l.len() {
           if i + 1 < l.len() {
-            write!(f, "{}, ", l[i]);
+            write!(f, "{}, ", l[i])?;
           } else {
-            write!(f, "{}", l[i]);
+            write!(f, "{}", l[i])?;
           }
         }
         write!(f, "]")?;
