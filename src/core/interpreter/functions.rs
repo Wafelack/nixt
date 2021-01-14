@@ -174,6 +174,7 @@ fn process_std(name: &str, args: &Vec<Value>) -> (bool, Result<Value, String>) {
     "list" => stdlib::list::list(args),
     "pop" => stdlib::list::pop(args),
     "push" => stdlib::list::push(args),
+    "at" => stdlib::list::index(args),
     // misc
     "assert" => stdlib::misc::assert(args),
     "type" => stdlib::misc::type_of(args),

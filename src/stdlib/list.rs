@@ -55,3 +55,36 @@ pub fn push(args: &Vec<Value>) -> Result<Value, String> {
 
   Ok(Value::Nil)
 }
+
+pub fn index(args: &Vec<Value>) -> Result<Value, String> {
+  if args.len() < 2 {
+    return Ok(Value::Nil);
+  }
+
+  if let Value::String(s) = &args[0] {
+    if let Value::Number(n) = args[1] {
+      if n.floor() as usize >= s.len() {
+        return Ok(Value::Nil);
+      } else {
+        return Ok(Value::String(format!(
+          "{}",
+          s.chars().collect::<Vec<char>>()[n.floor() as usize]
+        )));
+      }
+    } else {
+      return Ok(args[0].to_owned());
+    }
+  } else if let Value::List(l) = &args[0] {
+    if let Value::Number(n) = args[1] {
+      if n.floor() as usize >= l.len() {
+        return Ok(Value::Nil);
+      } else {
+        return Ok(l[n.floor() as usize].to_owned());
+      }
+    } else {
+      return Ok(args[0].to_owned());
+    }
+  } else {
+    return Ok(args[0].to_owned());
+  }
+}
