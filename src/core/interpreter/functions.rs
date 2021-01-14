@@ -167,6 +167,8 @@ fn process_std(name: &str, args: &Vec<Value>) -> (bool, Result<Value, String>) {
     "math:asin" => stdlib::maths::asin(args),
     "math:tan" => stdlib::maths::tan(args),
     "math:atan" => stdlib::maths::atan(args),
+    "math:floor" => stdlib::maths::floor(args),
+    "math:ceil" => stdlib::maths::ceil(args),
 
     // list
     "list" => stdlib::list::list(args),
