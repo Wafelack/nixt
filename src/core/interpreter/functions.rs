@@ -73,7 +73,7 @@ impl Interpreter {
           if self.get_value(&s).is_some() {
             self.get_value(&s).unwrap()
           } else {
-            return Err("Attempted to use an undefined variable: `{}`, s".to_owned());
+            return Err(format!("Attempted to use an undefined variable: `{}`", s));
           }
         }
         NodeType::FunctionCall(_) => self.process_func(child)?,

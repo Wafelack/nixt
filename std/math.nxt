@@ -30,5 +30,27 @@
   (ret toret)
 }))
 
+# @name: math:pow
+# @description: Returns x^y
+# @params: 
+#   - x: the number
+#   - y: the power
+# @return: number | any*
+# @author: Wafelack <wafelack@protonmail.com>
+(let math:pow (func (x y) {
+  (let toret 1)
+  (if (~ (type x) "number")
+    (set toret x)
+    (
+      (let i 0)
+      (while (< i y) {
+        (set toret (* toret x))
+        (set i (+ i 1))
+      }
+      ) 
+    )
+  (ret toret)
+)}))
+
 (const math:EULER 2.718281828459045)
 (const math:PI 3.141592653589793238462643383279502884197169399375105820974944592397816406)
