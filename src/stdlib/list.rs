@@ -16,3 +16,42 @@ pub fn pop(args: &Vec<Value>) -> Result<Value, String> {
 
   Ok(Value::Nil)
 }
+
+pub fn push(args: &Vec<Value>) -> Result<Value, String> {
+  if args.len() < 2 {
+    return Ok(Value::Nil);
+  }
+  if let Value::List(l) = &args[0] {
+    let mut toret = l.clone();
+    let listed = list(
+      &args
+        .iter()
+        .skip(1)
+        .map(|x| x.to_owned())
+        .collect::<Vec<Value>>(),
+    )?;
+    if let Value::List(to_add) = listed {
+      toret.extend(to_add);
+      return Ok(Value::List(toret));
+    } else {
+      return Ok(args[0].to_owned());
+    }
+  } else if let Value::String(s) = &args[0] {
+    let mut toret = s.clone();
+    let listed = crate::stdlib::str::cat(
+      &args
+        .iter()
+        .skip(1)
+        .map(|x| x.to_owned())
+        .collect::<Vec<Value>>(),
+    )?;
+    if let Value::String(to_add) = listed {
+      toret.push_str(&to_add);
+      return Ok(Value::String(toret));
+    } else {
+      return Ok(args[0].to_owned());
+    }
+  }
+
+  Ok(Value::Nil)
+}
