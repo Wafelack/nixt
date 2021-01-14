@@ -1,0 +1,16 @@
+# @name: str:substr
+# @description: splits s on the delimiter d
+# @params: 
+#   - str: the string
+#   - s: the start
+#   - e: the end
+# @return: string
+# @author: Wafelack <wafelack@protonmail.com>
+(let str:substr (func (str s e) {
+  (let toret '')
+  (while (and (< s e) (< s (len str))) {
+    (set toret (push toret (at str s)))
+    (set s (+ s 1))
+  })
+  (ret toret)
+}))
