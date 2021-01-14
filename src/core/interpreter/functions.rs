@@ -152,25 +152,32 @@ impl Interpreter {
 fn process_std(name: &str, args: &Vec<Value>) -> (bool, Result<Value, String>) {
   let mut found = true;
 
-  let toret = if &name == &"print" {
-    stdlib::io::print(&args)
-  } else if &name == &"puts" {
-    stdlib::io::puts(&args)
-  } else if &name == &"time:now" {
-    stdlib::time::now()
-  } else if &name == &"str:cat" {
-    stdlib::str::cat(args)
-  } else if &name == &"list" {
-    stdlib::list::list(args)
-  } else if &name == &"pop" {
-    stdlib::list::pop(args)
-  } else if &name == &"assert" {
-    stdlib::assert::assert(args)
-  } else if &name == &"type" {
-    stdlib::typing::type_of(args)
-  } else {
-    found = false;
-    Ok(Value::Nil)
+  let toret = match name {
+    "print" => stdlib::io::print(args),
+    "puts" => stdlib::io::puts(&args),
+    "time:now" => stdlib::time::now(),
+
+    // str
+    "str:cat" => stdlib::str::cat(args),
+
+    // maths
+    "math:cos" => stdlib::maths::cos(args),
+    "math:acos" => stdlib::maths::acos(args),
+    "math:sin" => stdlib::maths::sin(args),
+    "math:asin" => stdlib::maths::asin(args),
+    "math:tan" => stdlib::maths::tan(args),
+    "math:atan" => stdlib::maths::atan(args),
+
+    // list
+    "list" => stdlib::list::list(args),
+    "pop" => stdlib::list::pop(args),
+    // misc
+    "assert" => stdlib::misc::assert(args),
+    "type" => stdlib::misc::type_of(args),
+    _ => {
+      found = false;
+      Ok(Value::Nil)
+    }
   };
 
   (found, toret)
