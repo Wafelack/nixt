@@ -3,6 +3,7 @@ mod test {
   use crate::{
     core::interpreter::interpreter::Interpreter, core::lexer::*, core::parser::*, utils::node::*,
   };
+  use std::time::Instant;
 
   fn get_ast(code: &str) -> Result<String, String> {
     let mut lexer = Lexer::new(code);
@@ -257,6 +258,33 @@ mod test {
     (assert (~ bar "NOTBAR"))
     "#;
     run(code)?;
+
+    Ok(())
+  }
+
+  #[test]
+  fn ackermann_bench() -> Result<(), String> {
+    let code = r#"
+    (let ackermann (func (m n) {
+      (let toret 0)
+      (if (= m 0)
+        (set toret (+ n 1))
+        (if (and (> m 0) (= n 0))
+          (set toret (ackermann (- m 1) 1))
+          (if (and (> m 0) (> n 0))
+            (set toret (ackermann (- m 1) (ackermann m (- n 1))))
+          )
+        )
+      )
+      (ret toret)
+    }))
+    (ackermann 3 3)
+    "#;
+    let start = Instant::now();
+    run(code)?;
+    let elapsed = start.elapsed();
+    let secs = elapsed.as_secs_f32();
+    assert!(secs < 0.5);
 
     Ok(())
   }
