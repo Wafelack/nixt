@@ -78,5 +78,49 @@
   (ret toret)
 }))
 
+# @name: math:max
+# @description: Returns x if x > y, else it returns y
+# @params: 
+#   - x: the first number
+#   - y: the second number
+# @return: number | any*
+# @author: Wafelack <wafelack@protonmail.com>
+(let math:max (func (x y) {
+  (let toret 0)
+
+  (if (or (~ (type x) "number") (~ (type y) "number"))
+    (set toret x)
+    (
+      (if (> x y)
+        (set toret x)
+        (set toret y)
+      )
+    )
+  )
+  (ret toret)
+}))
+
+# @name: math:min
+# @description: Returns x if x < y, else it returns y
+# @params: 
+#   - x: the first number
+#   - y: the second number
+# @return: number | any*
+# @author: Wafelack <wafelack@protonmail.com>
+(let math:min (func (x y) {
+  (let toret 0)
+
+  (if (or (~ (type x) "number") (~ (type y) "number"))
+    (set toret x)
+    (
+      (if (< x y)
+        (set toret x)
+        (set toret y)
+      )
+    )
+  )
+  (ret toret)
+}))
+
 (const math:EULER 2.718281828459045)
 (const math:PI 3.141592653589793238462643383279502884197169399375105820974944592397816406)
