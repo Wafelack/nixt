@@ -24,7 +24,7 @@ Todo
 
 ```sh
 git clone https://github.com/wafelack/nixt
-cd nit/
+cd nixt/
 cargo test --release
 cargo build --release
 ```
