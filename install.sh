@@ -10,7 +10,7 @@ fi
 mkdir .nixt/
 echo "[+] Creating a new ~/.nixt directory"
 cd .nixt/
-wget https://github.com/Wafelack/nixt/releases/download/0.1.0-alpha/nixt.tar.gz
+wget -q https://github.com/Wafelack/nixt/releases/download/0.1.0-alpha/nixt.tar.gz
 echo "[+] Cloning release from repo"
 tar -xf nixt.tar.gz
 echo "[+] Extracting cloned archive"
