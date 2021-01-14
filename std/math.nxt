@@ -52,5 +52,31 @@
   (ret toret)
 )}))
 
+# @name: math:sqrt
+# @description: Returns sqrt(n)
+# @params: 
+#   - n: the number
+# @return: number | any*
+# @author: Wafelack <wafelack@protonmail.com>
+(let math:sqrt (func (n) {
+  (let toret 0)
+
+  (if (~ (type n) "number")
+    (set toret n)
+    (
+      (set toret (/ n 2))
+      (let i 0)
+      (while (< i 10) {
+        (set i (+ i 1))
+        (set toret (- toret ( /
+          (- (* toret toret) n)
+          (* 2 toret)
+        )))
+      })
+    )
+  )
+  (ret toret)
+}))
+
 (const math:EULER 2.718281828459045)
 (const math:PI 3.141592653589793238462643383279502884197169399375105820974944592397816406)
