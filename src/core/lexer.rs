@@ -50,7 +50,13 @@ impl Lexer {
             ')' => self.add_token(RightParen),
             ',' => self.add_token(Comma),
             '.' => self.add_token(Dot),
-            '-' => self.add_token(Minus),
+            '-' => {
+                if self.peek().is_digit(10) {
+                    self.number();
+                } else {
+                    self.add_token(Minus);
+                }
+            }
             '+' => self.add_token(Plus),
             '*' => self.add_token(Star),
             '/' => self.add_token(Slash),

@@ -166,6 +166,8 @@ fn process_std(name: &str, args: &Vec<Value>) -> (bool, Result<Value, String>) {
     stdlib::list::pop(args)
   } else if &name == &"assert" {
     stdlib::assert::assert(args)
+  } else if &name == &"type" {
+    stdlib::typing::type_of(args)
   } else {
     found = false;
     Ok(Value::Nil)

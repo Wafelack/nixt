@@ -1,0 +1,23 @@
+# @name: math:abs
+# @description: Returns the absolute value of a number
+# @params: 
+#   - n: the number
+# @return: number | any*
+# @author: Wafelack <wafelack@protonmail.com>
+(let math:abs (func (n) {
+  (let toret 0)
+  (if (~ (type n) "number")
+    (set toret n)
+    (if (< n 0) 
+      (set toret (* -1 n))
+      (set toret n)
+  ))
+  (ret toret)
+}))
+
+# @name: math:inv
+# @description: Returns 1/n
+# @params: 
+#   - n: the number
+# @return: number | any*
+# @author: Wafelack <wafelack@protonmail.com>
