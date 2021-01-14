@@ -21,3 +21,11 @@
 #   - n: the number
 # @return: number | any*
 # @author: Wafelack <wafelack@protonmail.com>
+(let math:inv (func (n) {
+  (let toret 0)
+  (if (~ (type n) "number")
+    (set toret n)
+    (set toret (/ 1 n))
+  )
+  (ret toret)
+}))
