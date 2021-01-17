@@ -65,3 +65,22 @@ All major changes will be written here
 
 - assert
 - type
+
+# 0.1.0 
+
+## Added
+
+### cli
+
+- Added version to REPL
+
+### std
+
+#### fs
+
+- fs:read_dir
+- fs:exists
+- fs:read_file
+- fs:remove_dir
+- fs:create_dir
+- fs:write_file
