@@ -54,7 +54,17 @@ Nixt goal is to provide a fast and easy to learn scripting language that provide
 
 # Installation
 
-Download and run install.sh
+## With werb
+
+- Run `werb install nixt`
+- Add `export NIXT_STD="/home/$USERNAME/.werb_bin/std/"` to your `~/.bashrc` (obviously replace $USERNAME with your username)
+
+## Manually
+
+- Run `wget https://github.com/Wafelack/nixt/releases/download/$VERSION/nixt.tar.gz` (replace $VERSION with the version tag you want to download (refer to the releases page))
+- Run `mkdir ~/.nixt && tar -xzf nixt.tar.gz -C ~/.nixt/`
+- Add `~/.nixt` to your path
+- Add `export NIXT_STD="/home/$USERNAME/.nixt/std/"` to your `~/.bashrc` (obviously replace $USERNAME with your username)
 
 # Build
 
