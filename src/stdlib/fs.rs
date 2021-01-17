@@ -30,6 +30,32 @@ pub fn read_dir(args: &Vec<Value>) -> Result<Value, String> {
 
 use std::fs;
 
+pub fn remove_dir(args: &Vec<Value>) -> Result<Value, String> {
+    if args.len() < 1 {
+        return Ok(Value::Nil);
+    }
+
+    if let Value::String(name) = &args[0] {
+        fs::remove_dir_all(name).map_err(|e| e.to_string())?;
+        Ok(Value::Nil)
+    } else {
+        Ok(Value::Nil)
+    }
+}
+
+pub fn create_dir(args: &Vec<Value>) -> Result<Value, String> {
+    if args.len() < 1 {
+        return Ok(Value::Nil);
+    }
+
+    if let Value::String(name) = &args[0] {
+        fs::create_dir_all(name).map_err(|e| e.to_string())?;
+        Ok(Value::Nil)
+    } else {
+        Ok(Value::Nil)
+    }
+}
+
 pub fn read_file(args: &Vec<Value>) -> Result<Value, String> {
     if args.len() < 1 {
         return Ok(Value::Nil);

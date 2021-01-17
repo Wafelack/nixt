@@ -174,6 +174,8 @@ fn process_std(name: &str, args: &Vec<Value>) -> (bool, Result<Value, String>) {
     "fs:exists" => stdlib::fs::exist(args),
     "fs:read_dir" => stdlib::fs::read_dir(args),
     "fs:read_file" =>  stdlib::fs::read_file(args),
+    "fs:remove_dir" => stdlib::fs::remove_dir(args),
+    "fs:create_dir" => stdlib::fs::create_dir(args),
 
     // list
     "list" => stdlib::list::list(args),
