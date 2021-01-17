@@ -50,6 +50,7 @@ fn main() -> Result<(), String> {
 
 fn repl() -> Result<(), String> {
     let mut interpreter = Interpreter::new(None)?;
+    println!("Nixt v{}", env!("CARGO_PKG_VERSION"));
     loop {
         let mut input = String::new();
         print!("> ");
