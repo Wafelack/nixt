@@ -43,6 +43,19 @@ pub fn remove_dir(args: &Vec<Value>) -> Result<Value, String> {
     }
 }
 
+pub fn remove_file(args: &Vec<Value>) -> Result<Value, String> {
+    if args.len() < 1 {
+        return Ok(Value::Nil);
+    }
+
+    if let Value::String(name) = &args[0] {
+        fs::remove_file(name).map_err(|e| e.to_string())?;
+        Ok(Value::Nil)
+    } else {
+        Ok(Value::Nil)
+    }
+}
+
 pub fn create_dir(args: &Vec<Value>) -> Result<Value, String> {
     if args.len() < 1 {
         return Ok(Value::Nil);

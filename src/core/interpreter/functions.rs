@@ -178,6 +178,7 @@ fn process_std(name: &str, args: &Vec<Value>) -> (bool, Result<Value, String>) {
     "fs:create_dir" => stdlib::fs::create_dir(args),
     "fs:create_file" => stdlib::fs::create_file(args),
     "fs:write_file" => stdlib::fs::write_file(args),
+    "fs:remove_file" => stdlib::fs::remove_file(args),
 
     // list
     "list" => stdlib::list::list(args),
