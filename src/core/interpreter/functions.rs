@@ -153,8 +153,12 @@ fn process_std(name: &str, args: &Vec<Value>) -> (bool, Result<Value, String>) {
   let mut found = true;
 
   let toret = match name {
+    // io
     "print" => stdlib::io::print(args),
     "puts" => stdlib::io::puts(&args),
+    "input" => stdlib::io::input(&args),
+
+    // time
     "time:now" => stdlib::time::now(),
 
     // str
