@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+cargo test --release
 cargo build --release
 cp ./target/release/nixt .
 tar -czf nixt.tar.gz nixt std/
