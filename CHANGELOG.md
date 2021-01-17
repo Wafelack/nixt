@@ -84,3 +84,8 @@ All major changes will be written here
 - fs:remove_dir
 - fs:create_dir
 - fs:write_file
+- fs:remove_file
+
+#### io
+
+- input
