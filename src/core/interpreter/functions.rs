@@ -170,6 +170,11 @@ fn process_std(name: &str, args: &Vec<Value>) -> (bool, Result<Value, String>) {
     "math:floor" => stdlib::maths::floor(args),
     "math:ceil" => stdlib::maths::ceil(args),
 
+    // fs
+    "fs:exists" => stdlib::fs::exist(args),
+    "fs:read_dir" => stdlib::fs::read_dir(args),
+    "fs:read_file" =>  stdlib::fs::read_file(args),
+
     // list
     "list" => stdlib::list::list(args),
     "pop" => stdlib::list::pop(args),
